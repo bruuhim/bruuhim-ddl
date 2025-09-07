@@ -91,7 +91,7 @@ export default async function HomePage({
         </ul>
       </main>
     );
-  } catch (error) {
+  } catch {
     notFound();
   }
 }
