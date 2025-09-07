@@ -67,17 +67,16 @@ export default function Home() {
     }
   }
 
-  const isFolder = (file: DriveFile): boolean => {
+  const isFolder = (file: DriveFile) => {
     return file.mimeType === 'application/vnd.google-apps.folder'
   }
 
-  const formatFileSize = (bytes: string): string => {
+  const formatFileSize = (bytes: string) => {
     if (!bytes) return ''
     const size = parseInt(bytes)
     const units = ['B', 'KB', 'MB', 'GB']
     let unitIndex = 0
     let fileSize = size
-
     while (fileSize >= 1024 && unitIndex < units.length - 1) {
       fileSize /= 1024
       unitIndex++
@@ -85,7 +84,7 @@ export default function Home() {
     return `${fileSize.toFixed(1)} ${units[unitIndex]}`
   }
 
-  const formatDate = (dateString: string): string => {
+  const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
@@ -111,56 +110,36 @@ export default function Home() {
     document.body.style.overflow = 'unset'
   }
 
-  const getFileIcon = (file: DriveFile): string => {
+  const getFileIcon = (file: DriveFile) => {
     if (isFolder(file)) return '📁'
-    
     const extension = file.name.split('.').pop()?.toLowerCase()
-    switch (extension) {
-      case 'mp4':
-      case 'mkv':
-      case 'avi':
-      case 'mov':
-        return '🎬'
-      case 'mp3':
-      case 'wav':
-      case 'flac':
-        return '🎵'
-      case 'jpg':
-      case 'jpeg':
-      case 'png':
-      case 'gif':
-        return '🖼️'
-      case 'zip':
-      case 'rar':
-      case '7z':
-        return '📦'
-      case 'pdf':
-        return '📄'
-      case 'txt':
-        return '📝'
-      default:
-        return '📄'
-    }
+    if (['mp4', 'mkv', 'avi', 'mov'].includes(extension || '')) return '🎬'
+    if (['mp3', 'wav', 'flac'].includes(extension || '')) return '🎵'
+    if (['jpg', 'jpeg', 'png', 'gif'].includes(extension || '')) return '🖼️'
+    if (['zip', 'rar', '7z'].includes(extension || '')) return '📦'
+    if (extension === 'pdf') return '📄'
+    if (extension === 'txt') return '📝'
+    return '📄'
   }
 
-  const getPreviewUrl = (file: DriveFile): string => {
+  const getPreviewUrl = (file: DriveFile) => {
     return `https://drive.google.com/file/d/${file.id}/preview`
   }
 
-  const getDownloadUrl = (file: DriveFile): string => {
+  const getDownloadUrl = (file: DriveFile) => {
     return `https://drive.google.com/uc?export=download&id=${file.id}`
   }
 
-  const getDirectLink = (file: DriveFile): string => {
+  const getDirectLink = (file: DriveFile) => {
     return `https://drive.google.com/file/d/${file.id}/view`
   }
 
-  const isVideoFile = (file: DriveFile): boolean => {
+  const isVideoFile = (file: DriveFile) => {
     const extension = file.name.split('.').pop()?.toLowerCase()
     return ['mp4', 'mkv', 'avi', 'mov', 'webm'].includes(extension || '')
   }
 
-  const isImageFile = (file: DriveFile): boolean => {
+  const isImageFile = (file: DriveFile) => {
     const extension = file.name.split('.').pop()?.toLowerCase()
     return ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension || '')
   }
@@ -356,7 +335,7 @@ export default function Home() {
                             className="bg-slate-700/50 hover:bg-slate-700 text-slate-300 hover:text-white px-3 sm:px-4 py-2 rounded-lg transition-all duration-200 text-xs sm:text-sm font-medium border border-slate-700/30 hover:border-slate-600 flex-1 sm:flex-none text-center"
                           >
                             Preview
-                          </a>
+                          </button>
                         </div>
                       )}
                     </div>
@@ -368,10 +347,8 @@ export default function Home() {
         )}
       </main>
 
-      {/* FIXED: Video Player with File List BELOW (like your image) */}
       {previewFile && (
         <div className="fixed inset-0 bg-black z-50 flex flex-col">
-          {/* Header */}
           <div className="bg-slate-900 px-4 py-3 border-b border-slate-700 flex items-center justify-between flex-shrink-0">
             <div className="flex items-center gap-3 min-w-0">
               <div className="text-lg flex-shrink-0">{getFileIcon(previewFile)}</div>
@@ -392,7 +369,6 @@ export default function Home() {
             </button>
           </div>
 
-          {/* Video Player - Takes most space */}
           <div className="flex-1 bg-black">
             {isVideoFile(previewFile) || isImageFile(previewFile) ? (
               <iframe
@@ -411,7 +387,6 @@ export default function Home() {
             )}
           </div>
 
-          {/* Action Buttons */}
           <div className="bg-slate-900 px-4 py-3 border-t border-slate-700 flex gap-3 flex-shrink-0">
             <a
               href={getDownloadUrl(previewFile)}
@@ -420,14 +395,12 @@ export default function Home() {
             >
               ⬇ Download
             </a>
-
             <button
               onClick={() => copyToClipboard(getDirectLink(previewFile))}
               className="bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2 rounded-lg font-medium"
             >
               Copy Link
             </button>
-
             <a
               href={getDirectLink(previewFile)}
               target="_blank"
@@ -438,16 +411,12 @@ export default function Home() {
             </a>
           </div>
 
-          {/* FIXED: File List BELOW Video (like your image) */}
           <div className="bg-slate-900 border-t border-slate-700 h-48 flex flex-col">
-            {/* Files Header */}
             <div className="px-4 py-2 border-b border-slate-700/50 flex-shrink-0">
               <h4 className="text-sm font-medium text-slate-300">
                 Files ({files.length})
               </h4>
             </div>
-            
-            {/* Scrollable File List */}
             <div className="flex-1 overflow-y-auto">
               {files.map((file) => (
                 <div
@@ -493,12 +462,10 @@ export default function Home() {
 
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
-        
         .font-inter {
           font-family: 'Inter', system-ui, sans-serif;
           font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
         }
-        
         html {
           scroll-behavior: smooth;
         }
