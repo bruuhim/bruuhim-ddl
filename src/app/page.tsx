@@ -29,12 +29,28 @@ export default function Home() {
     setCurrentFolderId(folderId)
     fetchFiles(folderId)
     fetchFolderPath(folderId)
+
+    // FIXED: Handle browser back/forward buttons
+    const handlePopState = () => {
+      const params = new URLSearchParams(window.location.search)
+      const folderId = params.get('folder') || process.env.NEXT_PUBLIC_GOOGLE_FOLDER_ID || ''
+      setCurrentFolderId(folderId)
+      fetchFiles(folderId)
+      fetchFolderPath(folderId)
+    }
+
+    window.addEventListener('popstate', handlePopState)
+
+    // Cleanup the event listener
+    return () => {
+      window.removeEventListener('popstate', handlePopState)
+    }
   }, [])
 
   const fetchFiles = async (folderId: string) => {
     setLoading(true)
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/files?folderId=${folderId}`)
+      const response = await fetch(`/api/files?folderId=${folderId}`)
       const data = await response.json()
       setFiles(data.files || [])
     } catch (err) {
@@ -46,7 +62,7 @@ export default function Home() {
 
   const fetchFolderPath = async (folderId: string) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/folder-path?folderId=${folderId}`)
+      const response = await fetch(`/api/folder-path?folderId=${folderId}`)
       const data = await response.json()
       setFolderPath(data.path || [])
     } catch (err) {
@@ -119,7 +135,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
-      {/* Header - SIMPLIFIED VERSION */}
+      {/* Header */}
       <div className="backdrop-blur-xl bg-black/30 border-b border-gray-700/50 sticky top-0 z-10">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
