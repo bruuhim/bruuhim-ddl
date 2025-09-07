@@ -356,7 +356,7 @@ export default function Home() {
                             className="bg-slate-700/50 hover:bg-slate-700 text-slate-300 hover:text-white px-3 sm:px-4 py-2 rounded-lg transition-all duration-200 text-xs sm:text-sm font-medium border border-slate-700/30 hover:border-slate-600 flex-1 sm:flex-none text-center"
                           >
                             Preview
-                          </button>
+                          </a>
                         </div>
                       )}
                     </div>
@@ -368,109 +368,108 @@ export default function Home() {
         )}
       </main>
 
+      {/* FIXED: Video Player with File List BELOW (like your image) */}
       {previewFile && (
-        <div className="fixed inset-0 bg-black z-50 flex h-screen">
-          <div className="flex-1 flex flex-col min-w-0">
-            <div className="bg-slate-900 px-4 py-3 border-b border-slate-700 flex items-center justify-between flex-shrink-0">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="text-lg flex-shrink-0">{getFileIcon(previewFile)}</div>
-                <div className="min-w-0">
-                  <h3 className="font-medium text-slate-200 leading-tight truncate">
-                    {previewFile.name}
-                  </h3>
-                  <p className="text-sm text-slate-500">
-                    {previewFile.size && formatFileSize(previewFile.size)} • {formatDate(previewFile.modifiedTime)}
-                  </p>
-                </div>
+        <div className="fixed inset-0 bg-black z-50 flex flex-col">
+          {/* Header */}
+          <div className="bg-slate-900 px-4 py-3 border-b border-slate-700 flex items-center justify-between flex-shrink-0">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="text-lg flex-shrink-0">{getFileIcon(previewFile)}</div>
+              <div className="min-w-0">
+                <h3 className="font-medium text-slate-200 leading-tight truncate">
+                  {previewFile.name}
+                </h3>
+                <p className="text-sm text-slate-500">
+                  {previewFile.size && formatFileSize(previewFile.size)} • {formatDate(previewFile.modifiedTime)}
+                </p>
               </div>
-              <button
-                onClick={closePreview}
-                className="text-slate-400 hover:text-slate-200 p-1 text-lg flex-shrink-0"
-              >
-                ✕
-              </button>
             </div>
-
-            <div className="flex-1 bg-black">
-              {isVideoFile(previewFile) || isImageFile(previewFile) ? (
-                <iframe
-                  src={getPreviewUrl(previewFile)}
-                  className="w-full h-full"
-                  title={previewFile.name}
-                  allow="autoplay; fullscreen"
-                  allowFullScreen
-                />
-              ) : (
-                <iframe
-                  src={getPreviewUrl(previewFile)}
-                  className="w-full h-full bg-white"
-                  title={previewFile.name}
-                />
-              )}
-            </div>
-
-            <div className="bg-slate-900 px-4 py-3 border-t border-slate-700 flex gap-3 flex-shrink-0">
-              <a
-                href={getDownloadUrl(previewFile)}
-                download
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2"
-              >
-                ⬇ Download
-              </a>
-
-              <button
-                onClick={() => copyToClipboard(getDirectLink(previewFile))}
-                className="bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2 rounded-lg font-medium"
-              >
-                Copy Link
-              </button>
-
-              <a
-                href={getDirectLink(previewFile)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2 rounded-lg font-medium"
-              >
-                Open in Drive
-              </a>
-            </div>
+            <button
+              onClick={closePreview}
+              className="text-slate-400 hover:text-slate-200 p-1 text-lg flex-shrink-0"
+            >
+              ✕
+            </button>
           </div>
 
-          <div className="w-80 bg-slate-900 border-l border-slate-700 flex flex-col">
-            <div className="px-3 py-2 border-b border-slate-700 bg-slate-800 flex-shrink-0">
-              <h4 className="font-medium text-slate-200 text-sm">
+          {/* Video Player - Takes most space */}
+          <div className="flex-1 bg-black">
+            {isVideoFile(previewFile) || isImageFile(previewFile) ? (
+              <iframe
+                src={getPreviewUrl(previewFile)}
+                className="w-full h-full"
+                title={previewFile.name}
+                allow="autoplay; fullscreen"
+                allowFullScreen
+              />
+            ) : (
+              <iframe
+                src={getPreviewUrl(previewFile)}
+                className="w-full h-full bg-white"
+                title={previewFile.name}
+              />
+            )}
+          </div>
+
+          {/* Action Buttons */}
+          <div className="bg-slate-900 px-4 py-3 border-t border-slate-700 flex gap-3 flex-shrink-0">
+            <a
+              href={getDownloadUrl(previewFile)}
+              download
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2"
+            >
+              ⬇ Download
+            </a>
+
+            <button
+              onClick={() => copyToClipboard(getDirectLink(previewFile))}
+              className="bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2 rounded-lg font-medium"
+            >
+              Copy Link
+            </button>
+
+            <a
+              href={getDirectLink(previewFile)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2 rounded-lg font-medium"
+            >
+              Open in Drive
+            </a>
+          </div>
+
+          {/* FIXED: File List BELOW Video (like your image) */}
+          <div className="bg-slate-900 border-t border-slate-700 h-48 flex flex-col">
+            {/* Files Header */}
+            <div className="px-4 py-2 border-b border-slate-700/50 flex-shrink-0">
+              <h4 className="text-sm font-medium text-slate-300">
                 Files ({files.length})
               </h4>
             </div>
             
+            {/* Scrollable File List */}
             <div className="flex-1 overflow-y-auto">
               {files.map((file) => (
                 <div
                   key={file.id}
-                  className={`px-3 py-2 border-b border-slate-700/30 hover:bg-slate-800/50 cursor-pointer transition-colors ${
+                  className={`px-4 py-2 border-b border-slate-700/30 hover:bg-slate-800/50 cursor-pointer transition-colors flex items-center gap-3 ${
                     previewFile.id === file.id ? 'bg-slate-800 border-l-4 border-l-blue-500' : ''
                   }`}
                   onClick={() => !isFolder(file) && setPreviewFile(file)}
                 >
-                  <div className="flex items-start gap-2">
-                    <div className="text-xs opacity-70 mt-0.5 flex-shrink-0">
-                      {getFileIcon(file)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs text-slate-200 leading-tight break-words">
-                        {file.name}
-                      </p>
-                      <div className="flex items-center gap-2 mt-1">
-                        {file.size && !isFolder(file) && (
-                          <span className="text-xs text-slate-500">
-                            {formatFileSize(file.size)}
-                          </span>
-                        )}
-                        <span className="text-xs text-slate-500">
-                          {formatDate(file.modifiedTime)}
-                        </span>
-                      </div>
-                    </div>
+                  <div className="text-sm flex-shrink-0">
+                    {getFileIcon(file)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-slate-200 truncate">
+                      {file.name}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3 text-xs text-slate-500 flex-shrink-0">
+                    {file.size && !isFolder(file) && (
+                      <span>{formatFileSize(file.size)}</span>
+                    )}
+                    <span>{formatDate(file.modifiedTime)}</span>
                   </div>
                 </div>
               ))}
