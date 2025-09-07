@@ -8,7 +8,10 @@ type DriveFile = {
 };
 
 async function getFiles() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/files`, { cache: 'no-store' });
+  // Make sure NEXT_PUBLIC_URL is set in Vercel
+  const baseUrl = process.env.NEXT_PUBLIC_URL; 
+  const res = await fetch(`${baseUrl}/api/files`, { cache: 'no-store' });
+  
   if (!res.ok) {
     throw new Error('Failed to fetch data');
   }
