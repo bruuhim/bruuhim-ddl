@@ -126,15 +126,8 @@ export default function Home() {
     }
   }
 
+  // FIXED: Use iframe embed URLs for all file types
   const getPreviewUrl = (file: DriveFile): string => {
-    const extension = file.name.split('.').pop()?.toLowerCase()
-    
-    // For videos and images, use streaming URL
-    if (['mp4', 'mkv', 'avi', 'mov', 'jpg', 'jpeg', 'png', 'gif', 'mp3', 'wav'].includes(extension || '')) {
-      return `https://drive.google.com/uc?export=view&id=${file.id}`
-    }
-    
-    // For other files, use embed URL
     return `https://drive.google.com/file/d/${file.id}/preview`
   }
 
@@ -343,7 +336,7 @@ export default function Home() {
         )}
       </main>
 
-      {/* Custom Preview Modal */}
+      {/* FIXED: Custom Preview Modal with iframe */}
       {previewFile && (
         <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-slate-900 rounded-2xl border border-slate-700 max-w-6xl w-full max-h-[90vh] overflow-hidden">
@@ -372,48 +365,16 @@ export default function Home() {
               </button>
             </div>
 
-            {/* Modal Content */}
+            {/* Modal Content - FIXED: Uses iframe for all files */}
             <div className="p-6">
-              {isVideoFile(previewFile) ? (
-                <div className="bg-black rounded-xl overflow-hidden">
-                  <video
-                    controls
-                    className="w-full h-auto max-h-[60vh]"
-                    preload="metadata"
-                  >
-                    <source src={getPreviewUrl(previewFile)} type="video/mp4" />
-                    Your browser does not support the video tag.
-                  </video>
-                </div>
-              ) : isImageFile(previewFile) ? (
-                <div className="flex justify-center">
-                  <img
-                    src={getPreviewUrl(previewFile)}
-                    alt={previewFile.name}
-                    className="max-w-full max-h-[60vh] rounded-xl"
-                  />
-                </div>
-              ) : isAudioFile(previewFile) ? (
-                <div className="bg-slate-800 rounded-xl p-8 text-center">
-                  <div className="text-6xl mb-6">🎵</div>
-                  <audio
-                    controls
-                    className="w-full max-w-md mx-auto"
-                    preload="metadata"
-                  >
-                    <source src={getPreviewUrl(previewFile)} />
-                    Your browser does not support the audio tag.
-                  </audio>
-                </div>
-              ) : (
-                <div className="bg-white rounded-xl overflow-hidden">
-                  <iframe
-                    src={getPreviewUrl(previewFile)}
-                    className="w-full h-[60vh]"
-                    title={previewFile.name}
-                  />
-                </div>
-              )}
+              <div className="bg-black rounded-xl overflow-hidden">
+                <iframe
+                  src={getPreviewUrl(previewFile)}
+                  className="w-full h-[70vh]"
+                  title={previewFile.name}
+                  allow="autoplay; fullscreen"
+                />
+              </div>
 
               {/* Action Buttons */}
               <div className="flex items-center justify-center gap-4 mt-6 pt-6 border-t border-slate-700">
