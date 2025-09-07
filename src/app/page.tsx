@@ -116,13 +116,30 @@ export default function Home() {
     
     const extension = file.name.split('.').pop()?.toLowerCase()
     switch (extension) {
-      case 'mp4': case 'mkv': case 'avi': case 'mov': return '🎬'
-      case 'mp3': case 'wav': case 'flac': return '🎵'
-      case 'jpg': case 'jpeg': case 'png': case 'gif': return '🖼️'
-      case 'zip': case 'rar': case '7z': return '📦'
-      case 'pdf': return '📄'
-      case 'txt': return '📝'
-      default: return '📄'
+      case 'mp4':
+      case 'mkv':
+      case 'avi':
+      case 'mov':
+        return '🎬'
+      case 'mp3':
+      case 'wav':
+      case 'flac':
+        return '🎵'
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+      case 'gif':
+        return '🖼️'
+      case 'zip':
+      case 'rar':
+      case '7z':
+        return '📦'
+      case 'pdf':
+        return '📄'
+      case 'txt':
+        return '📝'
+      default:
+        return '📄'
     }
   }
 
@@ -226,7 +243,7 @@ export default function Home() {
                   Home
                 </Link>
               </li>
-              {folderPath.map((folder, idx) => (
+              {folderPath.map((folder) => (
                 <li key={folder.id} className="flex items-center flex-shrink-0">
                   <svg className="w-4 h-4 text-slate-600 mx-2 sm:mx-3" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd"/>
@@ -280,7 +297,7 @@ export default function Home() {
               </div>
             ) : (
               <div className="divide-y divide-slate-800/50">
-                {files.map((file, index) => (
+                {files.map((file) => (
                   <div 
                     key={file.id} 
                     className="px-4 sm:px-6 lg:px-8 py-4 sm:py-5 hover:bg-slate-800/30 transition-all duration-200 group"
@@ -339,7 +356,7 @@ export default function Home() {
                             className="bg-slate-700/50 hover:bg-slate-700 text-slate-300 hover:text-white px-3 sm:px-4 py-2 rounded-lg transition-all duration-200 text-xs sm:text-sm font-medium border border-slate-700/30 hover:border-slate-600 flex-1 sm:flex-none text-center"
                           >
                             Preview
-                          </a>
+                          </button>
                         </div>
                       )}
                     </div>
@@ -351,12 +368,9 @@ export default function Home() {
         )}
       </main>
 
-      {/* FIXED: Compact Video Player Layout */}
       {previewFile && (
         <div className="fixed inset-0 bg-black z-50 flex h-screen">
-          {/* Video Area - Takes most space */}
           <div className="flex-1 flex flex-col min-w-0">
-            {/* Header */}
             <div className="bg-slate-900 px-4 py-3 border-b border-slate-700 flex items-center justify-between flex-shrink-0">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="text-lg flex-shrink-0">{getFileIcon(previewFile)}</div>
@@ -377,7 +391,6 @@ export default function Home() {
               </button>
             </div>
 
-            {/* Video Player */}
             <div className="flex-1 bg-black">
               {isVideoFile(previewFile) || isImageFile(previewFile) ? (
                 <iframe
@@ -396,7 +409,6 @@ export default function Home() {
               )}
             </div>
 
-            {/* FIXED: Simplified Action Buttons */}
             <div className="bg-slate-900 px-4 py-3 border-t border-slate-700 flex gap-3 flex-shrink-0">
               <a
                 href={getDownloadUrl(previewFile)}
@@ -424,16 +436,13 @@ export default function Home() {
             </div>
           </div>
 
-          {/* FIXED: Compact File List Sidebar */}
           <div className="w-80 bg-slate-900 border-l border-slate-700 flex flex-col">
-            {/* Sidebar Header */}
             <div className="px-3 py-2 border-b border-slate-700 bg-slate-800 flex-shrink-0">
               <h4 className="font-medium text-slate-200 text-sm">
                 Files ({files.length})
               </h4>
             </div>
             
-            {/* FIXED: Scrollable Compact File List */}
             <div className="flex-1 overflow-y-auto">
               {files.map((file) => (
                 <div
