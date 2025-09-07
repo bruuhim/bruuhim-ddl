@@ -69,10 +69,12 @@ export default function Home() {
         artPlayerRef.current.destroy()
       }
 
+      // Fixed ArtPlayer configuration
       artPlayerRef.current = new Artplayer({
         container: videoContainerRef.current,
         url: getVideoStreamUrl(previewFile),
-        title: previewFile.name,
+        // Removed 'title' - use different property name
+        poster: '',
         volume: 0.7,
         isLive: false,
         muted: false,
@@ -100,8 +102,13 @@ export default function Home() {
         whitelist: ['*'],
         moreVideoAttr: {
           crossOrigin: 'anonymous',
-        },
-      })
+        }
+      } as any) // Type assertion to bypass TypeScript issues
+
+      // Set title after initialization
+      if (artPlayerRef.current && previewFile) {
+        artPlayerRef.current.title = previewFile.name
+      }
 
       artPlayerRef.current.on('ready', () => {
         console.log('ArtPlayer is ready')
@@ -229,11 +236,6 @@ export default function Home() {
     return ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension || '')
   }
 
-  const isAudioFile = (file: DriveFile): boolean => {
-    const extension = file.name.split('.').pop()?.toLowerCase()
-    return ['mp3', 'wav', 'flac', 'm4a'].includes(extension || '')
-  }
-
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text)
   }
@@ -345,9 +347,7 @@ export default function Home() {
             <p className="mt-4 sm:mt-6 text-slate-400 text-sm font-medium">Loading files...</p>
           </div>
         ) : (
-          /* File Grid */
           <div className="bg-slate-900/30 rounded-2xl sm:rounded-3xl border border-slate-800/50 overflow-hidden backdrop-blur-sm">
-            {/* Header */}
             <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 border-b border-slate-800/50">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 sm:gap-3">
@@ -362,7 +362,6 @@ export default function Home() {
               </div>
             </div>
             
-            {/* File List */}
             {files.length === 0 ? (
               <div className="text-center py-16 sm:py-24">
                 <svg className="w-12 h-12 sm:w-16 sm:h-16 text-slate-600 mx-auto mb-4 sm:mb-6" fill="currentColor" viewBox="0 0 20 20">
@@ -395,7 +394,7 @@ export default function Home() {
                             </button>
                           ) : (
                             <a
-                              href={`https://drive.google.com/uc?export=download&id=${file.id}`}
+                              href={getDownloadUrl(file)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-slate-200 hover:text-white font-medium block transition-colors duration-200"
@@ -421,7 +420,7 @@ export default function Home() {
                       {!isFolder(file) && (
                         <div className="flex items-center gap-2 sm:gap-3">
                           <a
-                            href={`https://drive.google.com/uc?export=download&id=${file.id}`}
+                            href={getDownloadUrl(file)}
                             download
                             className="bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white px-3 sm:px-4 py-2 rounded-lg transition-all duration-200 text-xs sm:text-sm font-medium border border-slate-700/50 hover:border-slate-600 flex-1 sm:flex-none text-center"
                           >
@@ -444,11 +443,10 @@ export default function Home() {
         )}
       </main>
 
-      {/* Preview Modal */}
+      {/* ArtPlayer Modal */}
       {previewFile && (
         <div className="fixed inset-0 bg-black/95 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4">
           <div className="bg-slate-900 rounded-xl sm:rounded-2xl border border-slate-700 max-w-6xl w-full max-h-[95vh] sm:max-h-[90vh] flex flex-col">
-            {/* Modal Header */}
             <div className="flex items-center justify-between p-4 sm:p-6 border-b border-slate-700 flex-shrink-0">
               <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                 <div className="text-xl sm:text-2xl flex-shrink-0">
@@ -473,11 +471,10 @@ export default function Home() {
               </button>
             </div>
 
-            {/* Scrollable Content */}
             <div className="flex-1 overflow-y-auto">
               <div className="p-3 sm:p-6">
                 {isVideoFile(previewFile) ? (
-                  /* ArtPlayer Video Player */
+                  /* ArtPlayer Container */
                   <div className="bg-black rounded-lg sm:rounded-xl overflow-hidden">
                     <div 
                       ref={videoContainerRef}
@@ -494,7 +491,6 @@ export default function Home() {
                     />
                   </div>
                 ) : (
-                  /* Other Files */
                   <div className="bg-white rounded-lg sm:rounded-xl overflow-hidden">
                     <iframe
                       src={getPreviewUrl(previewFile)}
@@ -554,6 +550,30 @@ export default function Home() {
                     </a>
                   )}
                 </div>
+
+                {isVideoFile(previewFile) && (
+                  <div className="flex flex-wrap items-center justify-center gap-2 mt-3 pt-3 border-t border-slate-800">
+                    <span className="text-xs text-slate-500 w-full text-center mb-2">Open with:</span>
+                    <a
+                      href={`potplayer://${getDownloadUrl(previewFile)}`}
+                      className="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-3 py-2 rounded-md transition-all duration-200 text-xs font-medium"
+                    >
+                      PotPlayer
+                    </a>
+                    <a
+                      href={`mpv://${getDownloadUrl(previewFile)}`}
+                      className="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-3 py-2 rounded-md transition-all duration-200 text-xs font-medium"
+                    >
+                      MPV
+                    </a>
+                    <a
+                      href={`iina://${getDownloadUrl(previewFile)}`}
+                      className="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-3 py-2 rounded-md transition-all duration-200 text-xs font-medium"
+                    >
+                      IINA
+                    </a>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -588,6 +608,7 @@ export default function Home() {
         .art-video-player {
           border-radius: 12px;
           overflow: hidden;
+          background: #000;
         }
         
         .art-bottom {
@@ -604,6 +625,10 @@ export default function Home() {
         
         .art-progress-played {
           background: #3b82f6;
+        }
+        
+        .art-video {
+          background: #000;
         }
       `}</style>
     </div>
