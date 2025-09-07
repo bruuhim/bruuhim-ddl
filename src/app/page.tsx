@@ -21,6 +21,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true)
   const [folderPath, setFolderPath] = useState<FolderPathItem[]>([])
   const [currentFolderId, setCurrentFolderId] = useState<string>('')
+  const [previewFile, setPreviewFile] = useState<DriveFile | null>(null)
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -100,6 +101,16 @@ export default function Home() {
     fetchFolderPath(folderId)
   }
 
+  const handlePreview = (file: DriveFile) => {
+    setPreviewFile(file)
+    document.body.style.overflow = 'hidden'
+  }
+
+  const closePreview = () => {
+    setPreviewFile(null)
+    document.body.style.overflow = 'unset'
+  }
+
   const getFileIcon = (file: DriveFile): string => {
     if (isFolder(file)) return '📁'
     
@@ -115,10 +126,37 @@ export default function Home() {
     }
   }
 
+  const getPreviewUrl = (file: DriveFile): string => {
+    const extension = file.name.split('.').pop()?.toLowerCase()
+    
+    // For videos and images, use streaming URL
+    if (['mp4', 'mkv', 'avi', 'mov', 'jpg', 'jpeg', 'png', 'gif', 'mp3', 'wav'].includes(extension || '')) {
+      return `https://drive.google.com/uc?export=view&id=${file.id}`
+    }
+    
+    // For other files, use embed URL
+    return `https://drive.google.com/file/d/${file.id}/preview`
+  }
+
+  const isVideoFile = (file: DriveFile): boolean => {
+    const extension = file.name.split('.').pop()?.toLowerCase()
+    return ['mp4', 'mkv', 'avi', 'mov', 'webm'].includes(extension || '')
+  }
+
+  const isImageFile = (file: DriveFile): boolean => {
+    const extension = file.name.split('.').pop()?.toLowerCase()
+    return ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension || '')
+  }
+
+  const isAudioFile = (file: DriveFile): boolean => {
+    const extension = file.name.split('.').pop()?.toLowerCase()
+    return ['mp3', 'wav', 'flac', 'm4a'].includes(extension || '')
+  }
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-inter">
-      {/* Elegant Header */}
-      <header className="border-b border-slate-800/50 bg-slate-950/80 backdrop-blur-xl sticky top-0 z-50">
+      {/* Header */}
+      <header className="border-b border-slate-800/50 bg-slate-950/80 backdrop-blur-xl sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-8 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-6">
@@ -288,14 +326,12 @@ export default function Home() {
                           >
                             Download
                           </a>
-                          <a
-                            href={`https://drive.google.com/file/d/${file.id}/view`}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                          <button
+                            onClick={() => handlePreview(file)}
                             className="bg-slate-700/50 hover:bg-slate-700 text-slate-300 hover:text-white px-4 py-2 rounded-xl transition-all duration-200 text-sm font-medium border border-slate-700/30 hover:border-slate-600"
                           >
                             Preview
-                          </a>
+                          </button>
                         </div>
                       )}
                     </div>
@@ -307,7 +343,109 @@ export default function Home() {
         )}
       </main>
 
-      {/* Minimal Footer */}
+      {/* Custom Preview Modal */}
+      {previewFile && (
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 rounded-2xl border border-slate-700 max-w-6xl w-full max-h-[90vh] overflow-hidden">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-slate-700">
+              <div className="flex items-center gap-4">
+                <div className="text-2xl">
+                  {getFileIcon(previewFile)}
+                </div>
+                <div>
+                  <h3 className="text-lg font-medium text-slate-200 truncate">
+                    {previewFile.name}
+                  </h3>
+                  <p className="text-sm text-slate-500">
+                    {previewFile.size && formatFileSize(previewFile.size)} • {formatDate(previewFile.modifiedTime)}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={closePreview}
+                className="text-slate-400 hover:text-slate-200 transition-colors p-2"
+              >
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"/>
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6">
+              {isVideoFile(previewFile) ? (
+                <div className="bg-black rounded-xl overflow-hidden">
+                  <video
+                    controls
+                    className="w-full h-auto max-h-[60vh]"
+                    preload="metadata"
+                  >
+                    <source src={getPreviewUrl(previewFile)} type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+              ) : isImageFile(previewFile) ? (
+                <div className="flex justify-center">
+                  <img
+                    src={getPreviewUrl(previewFile)}
+                    alt={previewFile.name}
+                    className="max-w-full max-h-[60vh] rounded-xl"
+                  />
+                </div>
+              ) : isAudioFile(previewFile) ? (
+                <div className="bg-slate-800 rounded-xl p-8 text-center">
+                  <div className="text-6xl mb-6">🎵</div>
+                  <audio
+                    controls
+                    className="w-full max-w-md mx-auto"
+                    preload="metadata"
+                  >
+                    <source src={getPreviewUrl(previewFile)} />
+                    Your browser does not support the audio tag.
+                  </audio>
+                </div>
+              ) : (
+                <div className="bg-white rounded-xl overflow-hidden">
+                  <iframe
+                    src={getPreviewUrl(previewFile)}
+                    className="w-full h-[60vh]"
+                    title={previewFile.name}
+                  />
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-center gap-4 mt-6 pt-6 border-t border-slate-700">
+                <a
+                  href={`https://drive.google.com/uc?export=download&id=${previewFile.id}`}
+                  download
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl transition-all duration-200 font-medium flex items-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd"/>
+                  </svg>
+                  Download
+                </a>
+                <a
+                  href={`https://drive.google.com/file/d/${previewFile.id}/view`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-slate-700 hover:bg-slate-600 text-slate-200 px-6 py-3 rounded-xl transition-all duration-200 font-medium flex items-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/>
+                    <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/>
+                  </svg>
+                  Open in Drive
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Footer */}
       <footer className="text-center pb-12 pt-20">
         <p className="text-slate-600 text-sm font-medium">
           <a 
