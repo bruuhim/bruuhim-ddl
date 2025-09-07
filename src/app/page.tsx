@@ -28,7 +28,11 @@ export default async function HomePage() {
         {files?.map((file: DriveFile) => ( // Use the specific DriveFile type instead of 'any'
           <li key={file.id} className="text-lg">
             <a
-              href={`https://drive.google.com/uc?export=download&id=${file.id}`}
+              href={
+                file.mimeType === 'application/vnd.google-apps.folder'
+                  ? `https://drive.google.com/drive/folders/${file.id}`
+                  : `https://drive.google.com/uc?export=download&id=${file.id}`
+              }
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-600 hover:underline"
