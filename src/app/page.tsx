@@ -93,7 +93,7 @@ export default function Home() {
   }
 
   const handleFolderClick = (folderId: string) => {
-    const newUrl = `/?folder=${folderId}`
+    const newUrl = `/?folder=${encodeURIComponent(folderId)}`
     window.history.pushState({}, '', newUrl)
     setCurrentFolderId(folderId)
     fetchFiles(folderId)
@@ -122,16 +122,17 @@ export default function Home() {
     return '📄'
   }
 
+  // 🔐 ENCRYPTED URL FUNCTIONS
   const getPreviewUrl = (file: DriveFile) => {
-    return `https://drive.google.com/file/d/${file.id}/preview`
+    return `/api/preview/${encodeURIComponent(file.id)}`
   }
 
   const getDownloadUrl = (file: DriveFile) => {
-    return `https://drive.google.com/uc?export=download&id=${file.id}`
+    return `/api/download/${encodeURIComponent(file.id)}`
   }
 
   const getDirectLink = (file: DriveFile) => {
-    return `https://drive.google.com/file/d/${file.id}/view`
+    return `/api/download/${encodeURIComponent(file.id)}`
   }
 
   const isVideoFile = (file: DriveFile) => {
@@ -228,7 +229,7 @@ export default function Home() {
                     <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd"/>
                   </svg>
                   <Link
-                    href={`/?folder=${folder.id}`}
+                    href={`/?folder=${encodeURIComponent(folder.id)}`}
                     className="text-slate-400 hover:text-slate-200 transition-colors duration-200 font-medium whitespace-nowrap"
                     onClick={(e) => {
                       e.preventDefault()
