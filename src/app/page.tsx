@@ -101,53 +101,6 @@ export default function Home() {
         moreVideoAttr: {
           crossOrigin: 'anonymous',
         },
-        settings: [
-          {
-            width: 200,
-            html: 'Subtitle',
-            tooltip: 'Subtitle',
-            icon: '<svg>...</svg>',
-            selector: [
-              {
-                html: 'Display',
-                tooltip: 'Show',
-                switch: true,
-                onSwitch: function (item: any) {
-                  item.tooltip = item.switch ? 'Hide' : 'Show'
-                  artPlayerRef.current.subtitle.show = !item.switch
-                  return !item.switch
-                },
-              },
-            ],
-          },
-        ],
-        controls: [
-          {
-            index: 10,
-            name: 'download',
-            position: 'right',
-            html: '⬇️',
-            tooltip: 'Download Video',
-            click: function () {
-              window.open(getDownloadUrl(previewFile), '_blank')
-            },
-          },
-        ],
-        contextmenu: [
-          {
-            html: 'Download Video',
-            click: function () {
-              window.open(getDownloadUrl(previewFile), '_blank')
-            },
-          },
-          {
-            html: 'Open in VLC',
-            click: function () {
-              window.open(`vlc://${getDownloadUrl(previewFile)}`, '_self')
-            },
-          },
-        ],
-        layers: [],
       })
 
       artPlayerRef.current.on('ready', () => {
@@ -259,7 +212,6 @@ export default function Home() {
   }
 
   const getVideoStreamUrl = (file: DriveFile): string => {
-    // Try multiple URL formats for better compatibility
     return `https://drive.google.com/uc?export=download&id=${file.id}`
   }
 
@@ -284,7 +236,6 @@ export default function Home() {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text)
-    // Could add a toast notification here
   }
 
   return (
@@ -481,7 +432,7 @@ export default function Home() {
                             className="bg-slate-700/50 hover:bg-slate-700 text-slate-300 hover:text-white px-3 sm:px-4 py-2 rounded-lg transition-all duration-200 text-xs sm:text-sm font-medium border border-slate-700/30 hover:border-slate-600 flex-1 sm:flex-none text-center"
                           >
                             Preview
-                          </a>
+                          </button>
                         </div>
                       )}
                     </div>
@@ -493,7 +444,7 @@ export default function Home() {
         )}
       </main>
 
-      {/* ARTPLAYER Integration Modal */}
+      {/* Preview Modal */}
       {previewFile && (
         <div className="fixed inset-0 bg-black/95 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4">
           <div className="bg-slate-900 rounded-xl sm:rounded-2xl border border-slate-700 max-w-6xl w-full max-h-[95vh] sm:max-h-[90vh] flex flex-col">
@@ -556,7 +507,6 @@ export default function Home() {
 
                 {/* Action Buttons */}
                 <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center justify-center gap-2 sm:gap-3 mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-slate-700">
-                  {/* Primary Download Button */}
                   <a
                     href={getDownloadUrl(previewFile)}
                     download
@@ -568,7 +518,6 @@ export default function Home() {
                     Download
                   </a>
 
-                  {/* Copy Direct Link */}
                   <button
                     onClick={() => copyToClipboard(getDirectLink(previewFile))}
                     className="bg-slate-700 hover:bg-slate-600 text-slate-200 hover:text-white px-3 sm:px-4 py-2.5 rounded-lg transition-all duration-200 font-medium flex items-center justify-center gap-2 text-xs sm:text-sm"
@@ -580,7 +529,6 @@ export default function Home() {
                     Copy Link
                   </button>
 
-                  {/* Open in Drive */}
                   <a
                     href={getDirectLink(previewFile)}
                     target="_blank"
@@ -594,7 +542,6 @@ export default function Home() {
                     Drive
                   </a>
 
-                  {/* Stream with VLC (if video) */}
                   {isVideoFile(previewFile) && (
                     <a
                       href={`vlc://${getDownloadUrl(previewFile)}`}
@@ -607,34 +554,6 @@ export default function Home() {
                     </a>
                   )}
                 </div>
-
-                {/* Additional Player Options for Videos */}
-                {isVideoFile(previewFile) && (
-                  <div className="flex flex-wrap items-center justify-center gap-2 mt-3 pt-3 border-t border-slate-800">
-                    <span className="text-xs text-slate-500 w-full text-center mb-2">Open with:</span>
-                    
-                    <a
-                      href={`potplayer://${getDownloadUrl(previewFile)}`}
-                      className="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-3 py-2 rounded-md transition-all duration-200 text-xs font-medium"
-                    >
-                      PotPlayer
-                    </a>
-                    
-                    <a
-                      href={`mpv://${getDownloadUrl(previewFile)}`}
-                      className="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-3 py-2 rounded-md transition-all duration-200 text-xs font-medium"
-                    >
-                      MPV
-                    </a>
-                    
-                    <a
-                      href={`iina://${getDownloadUrl(previewFile)}`}
-                      className="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-3 py-2 rounded-md transition-all duration-200 text-xs font-medium"
-                    >
-                      IINA
-                    </a>
-                  </div>
-                )}
               </div>
             </div>
           </div>
@@ -666,7 +585,6 @@ export default function Home() {
           scroll-behavior: smooth;
         }
 
-        /* ArtPlayer Dark Theme Customization */
         .art-video-player {
           border-radius: 12px;
           overflow: hidden;
