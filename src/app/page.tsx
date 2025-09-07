@@ -119,16 +119,15 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
-      {/* Header */}
+      {/* Header - SIMPLIFIED VERSION */}
       <div className="backdrop-blur-xl bg-black/30 border-b border-gray-700/50 sticky top-0 z-10">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              {/* FIXED LOGO SECTION */}
               <img 
                 src="/logo.png" 
-                alt="Bruuhim Logo" 
-                className="w-12 h-12 rounded-full object-cover border-2 border-blue-400 hover:border-purple-400 transition-all duration-300"
+                alt="Bruuhim" 
+                className="w-12 h-12 rounded-full"
               />
               <div>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
