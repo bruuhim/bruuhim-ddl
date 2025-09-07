@@ -147,7 +147,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-inter">
-      {/* MOBILE-OPTIMIZED Header */}
+      {/* Header */}
       <header className="border-b border-slate-800/50 bg-slate-950/80 backdrop-blur-xl sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
           <div className="flex items-center justify-between">
@@ -168,7 +168,19 @@ export default function Home() {
               </div>
             </div>
             
-            {/* MOBILE: Hide "Created by" text, show only on larger screens */}
+            <div className="sm:hidden">
+              <a 
+                href="https://x.com/bruuhim" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-slate-400 hover:text-slate-200 transition-colors p-2"
+              >
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                </svg>
+              </a>
+            </div>
+            
             <div className="hidden sm:flex items-center gap-4">
               <div className="text-right">
                 <p className="text-sm text-slate-500 font-medium">Created by</p>
@@ -185,27 +197,13 @@ export default function Home() {
                 </a>
               </div>
             </div>
-            
-            {/* MOBILE: Show only X icon */}
-            <div className="sm:hidden">
-              <a 
-                href="https://x.com/bruuhim" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-slate-400 hover:text-slate-200 transition-colors p-2"
-              >
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                </svg>
-              </a>
-            </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
-        {/* MOBILE-OPTIMIZED Breadcrumb */}
+        {/* Breadcrumb */}
         {folderPath.length > 0 && (
           <nav className="mb-6 sm:mb-10" aria-label="Breadcrumb">
             <ol className="flex items-center space-x-2 sm:space-x-3 text-sm overflow-x-auto pb-2">
@@ -254,7 +252,7 @@ export default function Home() {
             <p className="mt-4 sm:mt-6 text-slate-400 text-sm font-medium">Loading files...</p>
           </div>
         ) : (
-          /* MOBILE-OPTIMIZED File Grid */
+          /* FIXED: Mobile File Grid with NO truncation */
           <div className="bg-slate-900/30 rounded-2xl sm:rounded-3xl border border-slate-800/50 overflow-hidden backdrop-blur-sm">
             {/* Header */}
             <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 border-b border-slate-800/50">
@@ -271,7 +269,7 @@ export default function Home() {
               </div>
             </div>
             
-            {/* MOBILE-OPTIMIZED File List */}
+            {/* FIXED: File List - NO TRUNCATION */}
             {files.length === 0 ? (
               <div className="text-center py-16 sm:py-24">
                 <svg className="w-12 h-12 sm:w-16 sm:h-16 text-slate-600 mx-auto mb-4 sm:mb-6" fill="currentColor" viewBox="0 0 20 20">
@@ -286,21 +284,21 @@ export default function Home() {
                   <div 
                     key={file.id} 
                     className="px-4 sm:px-6 lg:px-8 py-4 sm:py-5 hover:bg-slate-800/30 transition-all duration-200 group"
-                    style={{ animationDelay: `${index * 30}ms` }}
                   >
-                    {/* MOBILE: Stack vertically, DESKTOP: Horizontal */}
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
-                      <div className="flex items-center gap-3 sm:gap-5 flex-1 min-w-0">
-                        <div className="text-xl sm:text-2xl opacity-80 group-hover:opacity-100 transition-opacity duration-200 flex-shrink-0">
+                    {/* MOBILE: Card-style layout */}
+                    <div className="block sm:flex sm:items-center sm:justify-between">
+                      <div className="flex items-start gap-3 sm:gap-5 mb-3 sm:mb-0">
+                        <div className="text-xl sm:text-2xl opacity-80 group-hover:opacity-100 transition-opacity duration-200 mt-1 sm:mt-0">
                           {getFileIcon(file)}
                         </div>
                         <div className="flex-1 min-w-0">
                           {isFolder(file) ? (
                             <button
                               onClick={() => handleFolderClick(file.id)}
-                              className="text-slate-200 hover:text-white font-medium block text-left transition-colors duration-200 group-hover:translate-x-1 transform w-full"
+                              className="text-slate-200 hover:text-white font-medium text-left transition-colors duration-200 w-full"
                             >
-                              <div className="truncate pr-4 sm:pr-0">
+                              {/* FIXED: Allow text to wrap, no truncation */}
+                              <div className="break-words leading-tight">
                                 {file.name}
                               </div>
                             </button>
@@ -309,14 +307,15 @@ export default function Home() {
                               href={`https://drive.google.com/uc?export=download&id=${file.id}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-slate-200 hover:text-white font-medium block transition-colors duration-200 group-hover:translate-x-1 transform"
+                              className="text-slate-200 hover:text-white font-medium block transition-colors duration-200"
                             >
-                              <div className="truncate pr-4 sm:pr-0">
+                              {/* FIXED: Allow text to wrap, no truncation */}
+                              <div className="break-words leading-tight">
                                 {file.name}
                               </div>
                             </a>
                           )}
-                          <div className="flex items-center gap-3 sm:gap-4 mt-2">
+                          <div className="flex items-center gap-3 mt-2">
                             {file.size && !isFolder(file) && (
                               <span className="text-xs text-slate-500 bg-slate-800/50 px-2 py-1 rounded-md">
                                 {formatFileSize(file.size)}
@@ -329,19 +328,19 @@ export default function Home() {
                         </div>
                       </div>
                       
-                      {/* MOBILE: Always show buttons, DESKTOP: Show on hover */}
+                      {/* Action buttons */}
                       {!isFolder(file) && (
-                        <div className="flex items-center gap-2 sm:gap-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-200 sm:translate-x-4 sm:group-hover:translate-x-0 flex-shrink-0">
+                        <div className="flex items-center gap-2 sm:gap-3">
                           <a
                             href={`https://drive.google.com/uc?export=download&id=${file.id}`}
                             download
-                            className="bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white px-3 sm:px-4 py-2 rounded-lg sm:rounded-xl transition-all duration-200 text-xs sm:text-sm font-medium border border-slate-700/50 hover:border-slate-600"
+                            className="bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white px-3 sm:px-4 py-2 rounded-lg transition-all duration-200 text-xs sm:text-sm font-medium border border-slate-700/50 hover:border-slate-600 flex-1 sm:flex-none text-center"
                           >
                             Download
                           </a>
                           <button
                             onClick={() => handlePreview(file)}
-                            className="bg-slate-700/50 hover:bg-slate-700 text-slate-300 hover:text-white px-3 sm:px-4 py-2 rounded-lg sm:rounded-xl transition-all duration-200 text-xs sm:text-sm font-medium border border-slate-700/30 hover:border-slate-600"
+                            className="bg-slate-700/50 hover:bg-slate-700 text-slate-300 hover:text-white px-3 sm:px-4 py-2 rounded-lg transition-all duration-200 text-xs sm:text-sm font-medium border border-slate-700/30 hover:border-slate-600 flex-1 sm:flex-none text-center"
                           >
                             Preview
                           </button>
@@ -356,18 +355,18 @@ export default function Home() {
         )}
       </main>
 
-      {/* MOBILE-OPTIMIZED Preview Modal */}
+      {/* Preview Modal */}
       {previewFile && (
         <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4">
           <div className="bg-slate-900 rounded-xl sm:rounded-2xl border border-slate-700 max-w-6xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden">
-            {/* Modal Header */}
             <div className="flex items-center justify-between p-4 sm:p-6 border-b border-slate-700">
               <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                 <div className="text-xl sm:text-2xl flex-shrink-0">
                   {getFileIcon(previewFile)}
                 </div>
                 <div className="min-w-0">
-                  <h3 className="text-base sm:text-lg font-medium text-slate-200 truncate">
+                  {/* FIXED: Modal title also wraps */}
+                  <h3 className="text-base sm:text-lg font-medium text-slate-200 break-words leading-tight">
                     {previewFile.name}
                   </h3>
                   <p className="text-xs sm:text-sm text-slate-500">
@@ -385,7 +384,6 @@ export default function Home() {
               </button>
             </div>
 
-            {/* Modal Content */}
             <div className="p-3 sm:p-6">
               <div className="bg-black rounded-lg sm:rounded-xl overflow-hidden">
                 <iframe
@@ -396,7 +394,6 @@ export default function Home() {
                 />
               </div>
 
-              {/* MOBILE-OPTIMIZED Action Buttons */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-slate-700">
                 <a
                   href={`https://drive.google.com/uc?export=download&id=${previewFile.id}`}
@@ -426,7 +423,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* Footer */}
       <footer className="text-center pb-8 sm:pb-12 pt-12 sm:pt-20">
         <p className="text-slate-600 text-sm font-medium">
           <a 
