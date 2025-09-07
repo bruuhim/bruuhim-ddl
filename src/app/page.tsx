@@ -1,5 +1,4 @@
 'use client'
-
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 
@@ -71,7 +70,6 @@ export default function Home() {
       fileSize /= 1024
       unitIndex++
     }
-
     return `${fileSize.toFixed(1)} ${units[unitIndex]}`
   }
 
@@ -126,17 +124,12 @@ export default function Home() {
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="relative group">
-                <div className="w-12 h-12 rounded-full overflow-hidden ring-2 ring-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 p-0.5 group-hover:ring-4 transition-all duration-300">
-                  <div className="w-full h-full rounded-full overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900">
-                    <img 
-                      src="/logo.png" 
-                      alt="Bruuhim Logo" 
-                      className="w-full h-full object-cover filter grayscale hover:grayscale-0 transition-all duration-500 group-hover:scale-110"
-                    />
-                  </div>
-                </div>
-              </div>
+              {/* FIXED LOGO SECTION */}
+              <img 
+                src="/logo.png" 
+                alt="Bruuhim Logo" 
+                className="w-12 h-12 rounded-full object-cover border-2 border-blue-400 hover:border-purple-400 transition-all duration-300"
+              />
               <div>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
                   Bruuhim DDL
