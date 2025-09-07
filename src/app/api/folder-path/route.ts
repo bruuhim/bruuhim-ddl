@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
     }
 
     const path: any[] = []
-    let currentId = realFolderId
+    let currentId: string | undefined = realFolderId
 
     while (currentId && currentId !== process.env.NEXT_PUBLIC_GOOGLE_FOLDER_ID) {
       const response = await drive.files.get({
@@ -38,13 +38,16 @@ export async function GET(request: NextRequest) {
         fields: 'id,name,parents',
       })
 
-      if (response.data) {
+      if (response.data && response.data.id && response.data.name) {
         // 🔐 ENCRYPT folder ID before adding to path
         path.unshift({
-          id: encrypt(response.data.id!),
+          id: encrypt(response.data.id),
           name: response.data.name,
         })
-        currentId = response.data.parents?.[0]
+        // 🔧 FIXED: Handle undefined parents properly
+        currentId = response.data.parents && response.data.parents.length > 0 
+          ? response.data.parents[0] 
+          : undefined
       } else {
         break
       }
