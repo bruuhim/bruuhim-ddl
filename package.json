@@ -1,6 +1,7 @@
 {
-  "name": "my-file-indexer",
-  "version": "0.1.0",
+  "name": "bruuhim-ddl",
+  "version": "1.0.0",
+  "description": "Professional file directory by Bruuhim"
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
