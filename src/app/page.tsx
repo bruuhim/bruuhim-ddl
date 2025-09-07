@@ -339,7 +339,7 @@ export default function Home() {
                             className="bg-slate-700/50 hover:bg-slate-700 text-slate-300 hover:text-white px-3 sm:px-4 py-2 rounded-lg transition-all duration-200 text-xs sm:text-sm font-medium border border-slate-700/30 hover:border-slate-600 flex-1 sm:flex-none text-center"
                           >
                             Preview
-                          </button>
+                          </a>
                         </div>
                       )}
                     </div>
@@ -351,14 +351,17 @@ export default function Home() {
         )}
       </main>
 
+      {/* FIXED: Compact Video Player Layout */}
       {previewFile && (
-        <div className="fixed inset-0 bg-black z-50 flex">
-          <div className="flex-1 flex flex-col">
-            <div className="bg-slate-900 px-6 py-4 border-b border-slate-700 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="text-xl">{getFileIcon(previewFile)}</div>
-                <div>
-                  <h3 className="font-medium text-slate-200 leading-tight">
+        <div className="fixed inset-0 bg-black z-50 flex h-screen">
+          {/* Video Area - Takes most space */}
+          <div className="flex-1 flex flex-col min-w-0">
+            {/* Header */}
+            <div className="bg-slate-900 px-4 py-3 border-b border-slate-700 flex items-center justify-between flex-shrink-0">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="text-lg flex-shrink-0">{getFileIcon(previewFile)}</div>
+                <div className="min-w-0">
+                  <h3 className="font-medium text-slate-200 leading-tight truncate">
                     {previewFile.name}
                   </h3>
                   <p className="text-sm text-slate-500">
@@ -368,13 +371,14 @@ export default function Home() {
               </div>
               <button
                 onClick={closePreview}
-                className="text-slate-400 hover:text-slate-200 p-2 text-xl"
+                className="text-slate-400 hover:text-slate-200 p-1 text-lg flex-shrink-0"
               >
                 ✕
               </button>
             </div>
 
-            <div className="flex-1 bg-black flex items-center justify-center">
+            {/* Video Player */}
+            <div className="flex-1 bg-black">
               {isVideoFile(previewFile) || isImageFile(previewFile) ? (
                 <iframe
                   src={getPreviewUrl(previewFile)}
@@ -392,16 +396,14 @@ export default function Home() {
               )}
             </div>
 
-            <div className="bg-slate-900 px-6 py-4 border-t border-slate-700 flex flex-wrap gap-3">
+            {/* FIXED: Simplified Action Buttons */}
+            <div className="bg-slate-900 px-4 py-3 border-t border-slate-700 flex gap-3 flex-shrink-0">
               <a
                 href={getDownloadUrl(previewFile)}
                 download
                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2"
               >
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd"/>
-                </svg>
-                Download
+                ⬇ Download
               </a>
 
               <button
@@ -419,48 +421,34 @@ export default function Home() {
               >
                 Open in Drive
               </a>
-
-              {isVideoFile(previewFile) && (
-                <>
-                  <a
-                    href={`vlc://${getDownloadUrl(previewFile)}`}
-                    className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-medium"
-                  >
-                    VLC
-                  </a>
-                  <a
-                    href={`potplayer://${getDownloadUrl(previewFile)}`}
-                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium"
-                  >
-                    PotPlayer
-                  </a>
-                </>
-              )}
             </div>
           </div>
 
-          <div className="w-80 lg:w-96 bg-slate-900 border-l border-slate-700 flex flex-col">
-            <div className="px-4 py-3 border-b border-slate-700 bg-slate-800">
-              <h4 className="font-medium text-slate-200">
+          {/* FIXED: Compact File List Sidebar */}
+          <div className="w-80 bg-slate-900 border-l border-slate-700 flex flex-col">
+            {/* Sidebar Header */}
+            <div className="px-3 py-2 border-b border-slate-700 bg-slate-800 flex-shrink-0">
+              <h4 className="font-medium text-slate-200 text-sm">
                 Files ({files.length})
               </h4>
             </div>
             
+            {/* FIXED: Scrollable Compact File List */}
             <div className="flex-1 overflow-y-auto">
-              {files.map((file, index) => (
+              {files.map((file) => (
                 <div
                   key={file.id}
-                  className={`px-4 py-3 border-b border-slate-700/50 hover:bg-slate-800/50 cursor-pointer transition-colors ${
+                  className={`px-3 py-2 border-b border-slate-700/30 hover:bg-slate-800/50 cursor-pointer transition-colors ${
                     previewFile.id === file.id ? 'bg-slate-800 border-l-4 border-l-blue-500' : ''
                   }`}
                   onClick={() => !isFolder(file) && setPreviewFile(file)}
                 >
-                  <div className="flex items-start gap-3">
-                    <div className="text-sm opacity-70 mt-0.5">
+                  <div className="flex items-start gap-2">
+                    <div className="text-xs opacity-70 mt-0.5 flex-shrink-0">
                       {getFileIcon(file)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm text-slate-200 leading-tight break-words">
+                      <p className="text-xs text-slate-200 leading-tight break-words">
                         {file.name}
                       </p>
                       <div className="flex items-center gap-2 mt-1">
