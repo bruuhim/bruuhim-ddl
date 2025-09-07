@@ -126,8 +126,14 @@ export default function Home() {
     }
   }
 
+  // UPDATED: Different URLs for different file types
   const getPreviewUrl = (file: DriveFile): string => {
     return `https://drive.google.com/file/d/${file.id}/preview`
+  }
+
+  // NEW: Get streaming URL for HTML5 video
+  const getVideoStreamUrl = (file: DriveFile): string => {
+    return `https://drive.google.com/uc?export=download&id=${file.id}`
   }
 
   const isVideoFile = (file: DriveFile): boolean => {
@@ -252,7 +258,7 @@ export default function Home() {
             <p className="mt-4 sm:mt-6 text-slate-400 text-sm font-medium">Loading files...</p>
           </div>
         ) : (
-          /* FIXED: Mobile File Grid with NO truncation */
+          /* File Grid */
           <div className="bg-slate-900/30 rounded-2xl sm:rounded-3xl border border-slate-800/50 overflow-hidden backdrop-blur-sm">
             {/* Header */}
             <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 border-b border-slate-800/50">
@@ -269,7 +275,7 @@ export default function Home() {
               </div>
             </div>
             
-            {/* FIXED: File List - NO TRUNCATION */}
+            {/* File List */}
             {files.length === 0 ? (
               <div className="text-center py-16 sm:py-24">
                 <svg className="w-12 h-12 sm:w-16 sm:h-16 text-slate-600 mx-auto mb-4 sm:mb-6" fill="currentColor" viewBox="0 0 20 20">
@@ -285,7 +291,6 @@ export default function Home() {
                     key={file.id} 
                     className="px-4 sm:px-6 lg:px-8 py-4 sm:py-5 hover:bg-slate-800/30 transition-all duration-200 group"
                   >
-                    {/* MOBILE: Card-style layout */}
                     <div className="block sm:flex sm:items-center sm:justify-between">
                       <div className="flex items-start gap-3 sm:gap-5 mb-3 sm:mb-0">
                         <div className="text-xl sm:text-2xl opacity-80 group-hover:opacity-100 transition-opacity duration-200 mt-1 sm:mt-0">
@@ -297,7 +302,6 @@ export default function Home() {
                               onClick={() => handleFolderClick(file.id)}
                               className="text-slate-200 hover:text-white font-medium text-left transition-colors duration-200 w-full"
                             >
-                              {/* FIXED: Allow text to wrap, no truncation */}
                               <div className="break-words leading-tight">
                                 {file.name}
                               </div>
@@ -309,7 +313,6 @@ export default function Home() {
                               rel="noopener noreferrer"
                               className="text-slate-200 hover:text-white font-medium block transition-colors duration-200"
                             >
-                              {/* FIXED: Allow text to wrap, no truncation */}
                               <div className="break-words leading-tight">
                                 {file.name}
                               </div>
@@ -328,7 +331,6 @@ export default function Home() {
                         </div>
                       </div>
                       
-                      {/* Action buttons */}
                       {!isFolder(file) && (
                         <div className="flex items-center gap-2 sm:gap-3">
                           <a
@@ -355,9 +357,9 @@ export default function Home() {
         )}
       </main>
 
-      {/* Preview Modal */}
+      {/* UPDATED: Custom Video Player Modal */}
       {previewFile && (
-        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4">
+        <div className="fixed inset-0 bg-black/95 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4">
           <div className="bg-slate-900 rounded-xl sm:rounded-2xl border border-slate-700 max-w-6xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden">
             <div className="flex items-center justify-between p-4 sm:p-6 border-b border-slate-700">
               <div className="flex items-center gap-3 sm:gap-4 min-w-0">
@@ -365,7 +367,6 @@ export default function Home() {
                   {getFileIcon(previewFile)}
                 </div>
                 <div className="min-w-0">
-                  {/* FIXED: Modal title also wraps */}
                   <h3 className="text-base sm:text-lg font-medium text-slate-200 break-words leading-tight">
                     {previewFile.name}
                   </h3>
@@ -384,16 +385,49 @@ export default function Home() {
               </button>
             </div>
 
+            {/* UPDATED: Better Preview Content */}
             <div className="p-3 sm:p-6">
-              <div className="bg-black rounded-lg sm:rounded-xl overflow-hidden">
-                <iframe
-                  src={getPreviewUrl(previewFile)}
-                  className="w-full h-[50vh] sm:h-[60vh] lg:h-[70vh]"
-                  title={previewFile.name}
-                  allow="autoplay; fullscreen"
-                />
+              <div className="rounded-lg sm:rounded-xl overflow-hidden">
+                {isVideoFile(previewFile) ? (
+                  // NEW: Native HTML5 Video Player with fullscreen support
+                  <video
+                    controls
+                    controlsList="nodownload"
+                    className="w-full h-[50vh] sm:h-[60vh] lg:h-[70vh] bg-black"
+                    preload="metadata"
+                    playsInline
+                    style={{ objectFit: 'contain' }}
+                  >
+                    <source src={getVideoStreamUrl(previewFile)} type="video/mp4" />
+                    <p className="text-slate-300 p-4">
+                      Your browser doesn't support HTML5 video. 
+                      <a href={getVideoStreamUrl(previewFile)} className="text-blue-400 hover:text-blue-300 underline ml-2">
+                        Download the video
+                      </a>
+                    </p>
+                  </video>
+                ) : isImageFile(previewFile) ? (
+                  <div className="flex justify-center bg-black">
+                    <img
+                      src={`https://drive.google.com/uc?export=view&id=${previewFile.id}`}
+                      alt={previewFile.name}
+                      className="max-w-full max-h-[60vh] object-contain"
+                    />
+                  </div>
+                ) : (
+                  // For non-video files, use iframe
+                  <div className="bg-white rounded-lg sm:rounded-xl overflow-hidden">
+                    <iframe
+                      src={getPreviewUrl(previewFile)}
+                      className="w-full h-[50vh] sm:h-[60vh] lg:h-[70vh]"
+                      title={previewFile.name}
+                      allow="autoplay; fullscreen"
+                    />
+                  </div>
+                )}
               </div>
 
+              {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-slate-700">
                 <a
                   href={`https://drive.google.com/uc?export=download&id=${previewFile.id}`}
