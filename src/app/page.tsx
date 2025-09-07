@@ -152,12 +152,8 @@ export default function Home() {
     navigator.clipboard.writeText(text)
   }
 
-  // Get video files for playlist
-  const videoFiles = files.filter(isVideoFile)
-
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-inter">
-      {/* Header */}
       <header className="border-b border-slate-800/50 bg-slate-950/80 backdrop-blur-xl sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
           <div className="flex items-center justify-between">
@@ -211,9 +207,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
-        {/* Breadcrumb */}
         {folderPath.length > 0 && (
           <nav className="mb-6 sm:mb-10" aria-label="Breadcrumb">
             <ol className="flex items-center space-x-2 sm:space-x-3 text-sm overflow-x-auto pb-2">
@@ -253,7 +247,6 @@ export default function Home() {
           </nav>
         )}
 
-        {/* Loading State */}
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20 sm:py-32">
             <div className="relative">
@@ -346,7 +339,7 @@ export default function Home() {
                             className="bg-slate-700/50 hover:bg-slate-700 text-slate-300 hover:text-white px-3 sm:px-4 py-2 rounded-lg transition-all duration-200 text-xs sm:text-sm font-medium border border-slate-700/30 hover:border-slate-600 flex-1 sm:flex-none text-center"
                           >
                             Preview
-                          </a>
+                          </button>
                         </div>
                       )}
                     </div>
@@ -358,12 +351,9 @@ export default function Home() {
         )}
       </main>
 
-      {/* ENHANCED Preview Modal - Like the image you showed */}
       {previewFile && (
         <div className="fixed inset-0 bg-black z-50 flex">
-          {/* Main Video Area */}
           <div className="flex-1 flex flex-col">
-            {/* Header */}
             <div className="bg-slate-900 px-6 py-4 border-b border-slate-700 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="text-xl">{getFileIcon(previewFile)}</div>
@@ -384,7 +374,6 @@ export default function Home() {
               </button>
             </div>
 
-            {/* Video Player */}
             <div className="flex-1 bg-black flex items-center justify-center">
               {isVideoFile(previewFile) || isImageFile(previewFile) ? (
                 <iframe
@@ -403,7 +392,6 @@ export default function Home() {
               )}
             </div>
 
-            {/* Action Buttons */}
             <div className="bg-slate-900 px-6 py-4 border-t border-slate-700 flex flex-wrap gap-3">
               <a
                 href={getDownloadUrl(previewFile)}
@@ -451,7 +439,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* SCROLLABLE Playlist Sidebar - Like your image */}
           <div className="w-80 lg:w-96 bg-slate-900 border-l border-slate-700 flex flex-col">
             <div className="px-4 py-3 border-b border-slate-700 bg-slate-800">
               <h4 className="font-medium text-slate-200">
@@ -459,7 +446,6 @@ export default function Home() {
               </h4>
             </div>
             
-            {/* FIXED: Scrollable file list */}
             <div className="flex-1 overflow-y-auto">
               {files.map((file, index) => (
                 <div
