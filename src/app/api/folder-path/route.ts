@@ -1,47 +1,61 @@
-// src/app/api/folder-path/route.ts
-import { google } from 'googleapis';
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server'
+import { google } from 'googleapis'
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const folderId = searchParams.get('folderId');
-    
-    if (!folderId || folderId === process.env.GOOGLE_FOLDER_ID) {
-      return Response.json([]);
+    const { searchParams } = new URL(request.url)
+    const folderId = searchParams.get('folderId')
+    const rootFolderId = process.env.GOOGLE_FOLDER_ID
+
+    if (!folderId || folderId === rootFolderId) {
+      return NextResponse.json({ path: [] })
     }
 
+    // Set up Google Drive API
     const auth = new google.auth.GoogleAuth({
       credentials: {
         client_email: process.env.GOOGLE_CLIENT_EMAIL,
         private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
       },
       scopes: ['https://www.googleapis.com/auth/drive.readonly'],
-    });
+    })
 
-    const drive = google.drive({ version: 'v3', auth });
+    const drive = google.drive({ version: 'v3', auth })
 
-    const path: { id: string; name: string }[] = [];
-    let currentId = folderId;
-    const rootFolderId = process.env.GOOGLE_FOLDER_ID;
+    // Build path by traversing up the folder hierarchy
+    const path: { id: string; name: string }[] = []
+    let currentFolderId = folderId
 
-    while (currentId && currentId !== rootFolderId) {
-      const response = await drive.files.get({
-        fileId: currentId,
-        fields: 'id, name, parents',
-      });
+    while (currentFolderId && currentFolderId !== rootFolderId) {
+      try {
+        const response = await drive.files.get({
+          fileId: currentFolderId,
+          fields: 'id,name,parents'
+        })
 
-      const file = response.data;
-      if (file.name && file.id) {
-        path.unshift({ id: file.id, name: file.name });
+        const folder = response.data
+        if (folder.name && folder.id) {
+          path.unshift({
+            id: folder.id,
+            name: folder.name
+          })
+        }
+
+        // Move to parent folder
+        currentFolderId = folder.parents?.[0] || ''
+      } catch (err) {
+        console.error('Error getting folder info:', err)
+        break
       }
-
-      currentId = file.parents?.[0];
     }
 
-    return Response.json(path);
+    return NextResponse.json({ path })
+
   } catch (error) {
-    console.error('Error fetching folder path:', error);
-    return Response.json([]);
+    console.error('Error building folder path:', error)
+    return NextResponse.json(
+      { error: 'Failed to build folder path' },
+      { status: 500 }
+    )
   }
 }
