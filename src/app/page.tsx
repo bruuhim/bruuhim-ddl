@@ -45,7 +45,6 @@ export default function Home() {
     return () => window.removeEventListener('popstate', handlePopState)
   }, [])
 
-  // Initialize ArtPlayer when preview file changes
   useEffect(() => {
     if (previewFile && isVideoFile(previewFile) && videoContainerRef.current) {
       initializeArtPlayer()
@@ -69,11 +68,9 @@ export default function Home() {
         artPlayerRef.current.destroy()
       }
 
-      // Fixed ArtPlayer configuration
       artPlayerRef.current = new Artplayer({
         container: videoContainerRef.current,
-        url: getVideoStreamUrl(previewFile),
-        // Removed 'title' - use different property name
+        url: `/api/video-proxy?fileId=${previewFile.id}`,
         poster: '',
         volume: 0.7,
         isLive: false,
@@ -102,16 +99,15 @@ export default function Home() {
         whitelist: ['*'],
         moreVideoAttr: {
           crossOrigin: 'anonymous',
-        }
-      } as any) // Type assertion to bypass TypeScript issues
+        },
+      } as any)
 
-      // Set title after initialization
       if (artPlayerRef.current && previewFile) {
         artPlayerRef.current.title = previewFile.name
       }
 
       artPlayerRef.current.on('ready', () => {
-        console.log('ArtPlayer is ready')
+        console.log('🎉 ArtPlayer loaded successfully!')
       })
 
       artPlayerRef.current.on('error', (error: any) => {
@@ -215,10 +211,6 @@ export default function Home() {
   }
 
   const getDownloadUrl = (file: DriveFile): string => {
-    return `https://drive.google.com/uc?export=download&id=${file.id}`
-  }
-
-  const getVideoStreamUrl = (file: DriveFile): string => {
     return `https://drive.google.com/uc?export=download&id=${file.id}`
   }
 
@@ -474,7 +466,7 @@ export default function Home() {
             <div className="flex-1 overflow-y-auto">
               <div className="p-3 sm:p-6">
                 {isVideoFile(previewFile) ? (
-                  /* ArtPlayer Container */
+                  /* ArtPlayer with Proxy */
                   <div className="bg-black rounded-lg sm:rounded-xl overflow-hidden">
                     <div 
                       ref={videoContainerRef}
