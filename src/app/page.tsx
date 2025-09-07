@@ -76,8 +76,8 @@ export default function Home() {
 
   // FIX: process.env is not available in the browser. 
   // Replace these with your actual values or a proper configuration method.
-  const NEXT_PUBLIC_GOOGLE_FOLDER_ID = 'YOUR_GOOGLE_FOLDER_ID';
-  const NEXT_PUBLIC_URL = ''; // Assuming API is on the same domain, or provide full URL.
+  const NEXT_PUBLIC_GOOGLE_FOLDER_ID = '17LikukvKy1ZwEGOumX6uBDD4NOHPVgmi';
+  const NEXT_PUBLIC_URL = 'bruuhim-ddl.vercel.app'; // Assuming API is on the same domain, or provide full URL.
 
   useEffect(() => {
     // Set dark mode on the body
