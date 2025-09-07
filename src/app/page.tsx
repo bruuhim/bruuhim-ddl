@@ -126,14 +126,16 @@ export default function Home() {
     }
   }
 
-  // UPDATED: Different URLs for different file types
   const getPreviewUrl = (file: DriveFile): string => {
     return `https://drive.google.com/file/d/${file.id}/preview`
   }
 
-  // NEW: Get streaming URL for HTML5 video
-  const getVideoStreamUrl = (file: DriveFile): string => {
+  const getDownloadUrl = (file: DriveFile): string => {
     return `https://drive.google.com/uc?export=download&id=${file.id}`
+  }
+
+  const getDirectLink = (file: DriveFile): string => {
+    return `https://drive.google.com/file/d/${file.id}/view`
   }
 
   const isVideoFile = (file: DriveFile): boolean => {
@@ -149,6 +151,11 @@ export default function Home() {
   const isAudioFile = (file: DriveFile): boolean => {
     const extension = file.name.split('.').pop()?.toLowerCase()
     return ['mp3', 'wav', 'flac', 'm4a'].includes(extension || '')
+  }
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text)
+    // Could add a toast notification here
   }
 
   return (
@@ -357,10 +364,11 @@ export default function Home() {
         )}
       </main>
 
-      {/* UPDATED: Custom Video Player Modal */}
+      {/* MUGI DDL-STYLE Video Player Modal */}
       {previewFile && (
         <div className="fixed inset-0 bg-black/95 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4">
           <div className="bg-slate-900 rounded-xl sm:rounded-2xl border border-slate-700 max-w-6xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden">
+            {/* Modal Header */}
             <div className="flex items-center justify-between p-4 sm:p-6 border-b border-slate-700">
               <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                 <div className="text-xl sm:text-2xl flex-shrink-0">
@@ -385,73 +393,120 @@ export default function Home() {
               </button>
             </div>
 
-            {/* UPDATED: Better Preview Content */}
+            {/* MUGI DDL-STYLE Video Player */}
             <div className="p-3 sm:p-6">
-              <div className="rounded-lg sm:rounded-xl overflow-hidden">
-                {isVideoFile(previewFile) ? (
-                  // NEW: Native HTML5 Video Player with fullscreen support
-                  <video
-                    controls
-                    controlsList="nodownload"
-                    className="w-full h-[50vh] sm:h-[60vh] lg:h-[70vh] bg-black"
-                    preload="metadata"
-                    playsInline
-                    style={{ objectFit: 'contain' }}
-                  >
-                    <source src={getVideoStreamUrl(previewFile)} type="video/mp4" />
-                    <p className="text-slate-300 p-4">
-                      Your browser doesn't support HTML5 video. 
-                      <a href={getVideoStreamUrl(previewFile)} className="text-blue-400 hover:text-blue-300 underline ml-2">
-                        Download the video
-                      </a>
-                    </p>
-                  </video>
-                ) : isImageFile(previewFile) ? (
-                  <div className="flex justify-center bg-black">
-                    <img
-                      src={`https://drive.google.com/uc?export=view&id=${previewFile.id}`}
-                      alt={previewFile.name}
-                      className="max-w-full max-h-[60vh] object-contain"
-                    />
-                  </div>
-                ) : (
-                  // For non-video files, use iframe
-                  <div className="bg-white rounded-lg sm:rounded-xl overflow-hidden">
-                    <iframe
-                      src={getPreviewUrl(previewFile)}
-                      className="w-full h-[50vh] sm:h-[60vh] lg:h-[70vh]"
-                      title={previewFile.name}
-                      allow="autoplay; fullscreen"
-                    />
-                  </div>
-                )}
-              </div>
+              {isVideoFile(previewFile) ? (
+                /* Custom Video Player Interface */
+                <div className="bg-black rounded-lg sm:rounded-xl overflow-hidden">
+                  <iframe
+                    src={getPreviewUrl(previewFile)}
+                    className="w-full h-[50vh] sm:h-[60vh] lg:h-[70vh]"
+                    title={previewFile.name}
+                    allow="autoplay; fullscreen"
+                    allowFullScreen
+                  />
+                </div>
+              ) : isImageFile(previewFile) ? (
+                <div className="flex justify-center bg-black rounded-lg sm:rounded-xl overflow-hidden">
+                  <img
+                    src={`https://drive.google.com/uc?export=view&id=${previewFile.id}`}
+                    alt={previewFile.name}
+                    className="max-w-full max-h-[60vh] object-contain"
+                  />
+                </div>
+              ) : (
+                /* Other Files */
+                <div className="bg-white rounded-lg sm:rounded-xl overflow-hidden">
+                  <iframe
+                    src={getPreviewUrl(previewFile)}
+                    className="w-full h-[50vh] sm:h-[60vh] lg:h-[70vh]"
+                    title={previewFile.name}
+                    allow="autoplay; fullscreen"
+                  />
+                </div>
+              )}
 
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-slate-700">
+              {/* MUGI DDL-STYLE Action Buttons */}
+              <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center justify-center gap-2 sm:gap-3 mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-slate-700">
+                {/* Primary Download Button */}
                 <a
-                  href={`https://drive.google.com/uc?export=download&id=${previewFile.id}`}
+                  href={getDownloadUrl(previewFile)}
                   download
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-6 py-3 rounded-lg sm:rounded-xl transition-all duration-200 font-medium flex items-center justify-center gap-2 text-sm sm:text-base"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-4 py-2.5 rounded-lg transition-all duration-200 font-medium flex items-center justify-center gap-2 text-xs sm:text-sm col-span-2 sm:col-span-1"
                 >
-                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd"/>
                   </svg>
                   Download
                 </a>
+
+                {/* Copy Direct Link */}
+                <button
+                  onClick={() => copyToClipboard(getDirectLink(previewFile))}
+                  className="bg-slate-700 hover:bg-slate-600 text-slate-200 hover:text-white px-3 sm:px-4 py-2.5 rounded-lg transition-all duration-200 font-medium flex items-center justify-center gap-2 text-xs sm:text-sm"
+                >
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"/>
+                    <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"/>
+                  </svg>
+                  Copy Link
+                </button>
+
+                {/* Open in Drive */}
                 <a
-                  href={`https://drive.google.com/file/d/${previewFile.id}/view`}
+                  href={getDirectLink(previewFile)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 sm:px-6 py-3 rounded-lg sm:rounded-xl transition-all duration-200 font-medium flex items-center justify-center gap-2 text-sm sm:text-base"
+                  className="bg-slate-700 hover:bg-slate-600 text-slate-200 hover:text-white px-3 sm:px-4 py-2.5 rounded-lg transition-all duration-200 font-medium flex items-center justify-center gap-2 text-xs sm:text-sm"
                 >
-                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/>
                     <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/>
                   </svg>
-                  Open in Drive
+                  Drive
                 </a>
+
+                {/* Stream with VLC (if video) */}
+                {isVideoFile(previewFile) && (
+                  <a
+                    href={`vlc://${getDownloadUrl(previewFile)}`}
+                    className="bg-orange-600 hover:bg-orange-700 text-white px-3 sm:px-4 py-2.5 rounded-lg transition-all duration-200 font-medium flex items-center justify-center gap-2 text-xs sm:text-sm"
+                  >
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V4z"/>
+                    </svg>
+                    VLC
+                  </a>
+                )}
               </div>
+
+              {/* Additional Player Options for Videos */}
+              {isVideoFile(previewFile) && (
+                <div className="flex flex-wrap items-center justify-center gap-2 mt-3 pt-3 border-t border-slate-800">
+                  <span className="text-xs text-slate-500 w-full text-center mb-2">Open with:</span>
+                  
+                  <a
+                    href={`potplayer://${getDownloadUrl(previewFile)}`}
+                    className="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-3 py-2 rounded-md transition-all duration-200 text-xs font-medium"
+                  >
+                    PotPlayer
+                  </a>
+                  
+                  <a
+                    href={`mpv://${getDownloadUrl(previewFile)}`}
+                    className="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-3 py-2 rounded-md transition-all duration-200 text-xs font-medium"
+                  >
+                    MPV
+                  </a>
+                  
+                  <a
+                    href={`iina://${getDownloadUrl(previewFile)}`}
+                    className="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-3 py-2 rounded-md transition-all duration-200 text-xs font-medium"
+                  >
+                    IINA
+                  </a>
+                </div>
+              )}
             </div>
           </div>
         </div>
