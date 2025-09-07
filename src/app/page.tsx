@@ -97,18 +97,18 @@ export default function FileIndexer() {
   const regularFiles = filteredFiles.filter(file => !isFolder(file));
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-900">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-gray-800 border-b border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
-              <h1 className="text-xl font-semibold text-gray-900">File Explorer</h1>
+              <h1 className="text-xl font-semibold text-white">Bruuhim DDL</h1>
             </div>
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
-                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-md transition-colors"
               >
                 {viewMode === 'grid' ? <List className="w-5 h-5" /> : <Grid className="w-5 h-5" />}
               </button>
@@ -127,19 +127,19 @@ export default function FileIndexer() {
               placeholder="Search files..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+              className="w-full pl-10 pr-4 py-2 bg-gray-800 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all placeholder-gray-400"
             />
           </div>
         </div>
 
         {/* Breadcrumb */}
-        <div className="flex items-center space-x-2 mb-6 text-sm text-gray-500">
+        <div className="flex items-center space-x-2 mb-6 text-sm text-gray-400">
           <Home className="w-4 h-4" />
           {folderPath.map((folder, index) => (
             <React.Fragment key={folder.id}>
               <button
                 onClick={() => navigateToBreadcrumb(folder.id, index)}
-                className="hover:text-gray-700 transition-colors"
+                className="hover:text-white transition-colors"
               >
                 {folder.name}
               </button>
@@ -157,7 +157,7 @@ export default function FileIndexer() {
             {/* Folders */}
             {folders.length > 0 && (
               <div>
-                <h2 className="text-lg font-medium text-gray-900 mb-3">Folders</h2>
+                <h2 className="text-lg font-medium text-white mb-3">Folders</h2>
                 <div className={viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4' : 'space-y-1'}>
                   {folders.map((folder) => (
                     <div
@@ -165,13 +165,13 @@ export default function FileIndexer() {
                       onClick={() => navigateToFolder(folder.id, folder.name)}
                       className={`${
                         viewMode === 'grid' 
-                          ? 'p-4 border border-gray-200 rounded-lg hover:shadow-md cursor-pointer transition-all' 
-                          : 'flex items-center px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors rounded-md'
+                          ? 'p-4 bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 hover:shadow-lg cursor-pointer transition-all' 
+                          : 'flex items-center px-4 py-3 hover:bg-gray-800 cursor-pointer transition-colors rounded-md'
                       }`}
                     >
                       <div className="flex items-center space-x-3">
                         {getFileIcon(folder)}
-                        <span className="text-sm font-medium text-gray-900 truncate">{folder.name}</span>
+                        <span className="text-sm font-medium text-white truncate">{folder.name}</span>
                       </div>
                     </div>
                   ))}
@@ -182,22 +182,22 @@ export default function FileIndexer() {
             {/* Files */}
             {regularFiles.length > 0 && (
               <div>
-                <h2 className="text-lg font-medium text-gray-900 mb-3">Files</h2>
+                <h2 className="text-lg font-medium text-white mb-3">Files</h2>
                 <div className={viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4' : 'space-y-1'}>
                   {regularFiles.map((file) => (
                     <div
                       key={file.id}
                       className={`${
                         viewMode === 'grid' 
-                          ? 'p-4 border border-gray-200 rounded-lg hover:shadow-md transition-all' 
-                          : 'flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors rounded-md'
+                          ? 'p-4 bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 hover:shadow-lg transition-all' 
+                          : 'flex items-center justify-between px-4 py-3 hover:bg-gray-800 transition-colors rounded-md'
                       }`}
                     >
                       <div className="flex items-center space-x-3 min-w-0">
                         {getFileIcon(file)}
                         <div className="min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">{file.name}</p>
-                          <p className="text-xs text-gray-500">{formatFileSize(file.size)}</p>
+                          <p className="text-sm font-medium text-white truncate">{file.name}</p>
+                          <p className="text-xs text-gray-400">{formatFileSize(file.size)}</p>
                         </div>
                       </div>
                       <div className="flex items-center space-x-2 ml-4">
@@ -205,7 +205,7 @@ export default function FileIndexer() {
                           href={file.webViewLink}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded transition-colors"
+                          className="p-1.5 text-gray-400 hover:text-blue-400 hover:bg-gray-700 rounded transition-colors"
                           title="Preview"
                         >
                           <Eye className="w-4 h-4" />
@@ -213,7 +213,7 @@ export default function FileIndexer() {
                         {file.webContentLink && (
                           <a
                             href={file.webContentLink}
-                            className="p-1.5 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded transition-colors"
+                            className="p-1.5 text-gray-400 hover:text-green-400 hover:bg-gray-700 rounded transition-colors"
                             title="Download"
                           >
                             <Download className="w-4 h-4" />
