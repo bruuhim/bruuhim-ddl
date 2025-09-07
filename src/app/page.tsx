@@ -125,11 +125,24 @@ export default function Home() {
       <div className="backdrop-blur-xl bg-black/30 border-b border-gray-700/50 sticky top-0 z-10">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
-                Bruuhim DDL
-              </h1>
-              <p className="text-sm text-gray-400 mt-1">Premium File Directory</p>
+            <div className="flex items-center space-x-4">
+              <div className="relative group">
+                <div className="w-12 h-12 rounded-full overflow-hidden ring-2 ring-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 p-0.5 group-hover:ring-4 transition-all duration-300">
+                  <div className="w-full h-full rounded-full overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900">
+                    <img 
+                      src="/logo.png" 
+                      alt="Bruuhim Logo" 
+                      className="w-full h-full object-cover filter grayscale hover:grayscale-0 transition-all duration-500 group-hover:scale-110"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                  Bruuhim DDL
+                </h1>
+                <p className="text-sm text-gray-400 mt-1">Premium File Directory</p>
+              </div>
             </div>
             <div className="text-right">
               <p className="text-sm text-gray-400">Designed by</p>
@@ -137,8 +150,11 @@ export default function Home() {
                 href="https://x.com/bruuhim" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-blue-400 hover:text-blue-300 transition-colors font-medium"
+                className="text-blue-400 hover:text-blue-300 transition-colors font-medium flex items-center gap-1 justify-end"
               >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                </svg>
                 @bruuhim
               </a>
             </div>
