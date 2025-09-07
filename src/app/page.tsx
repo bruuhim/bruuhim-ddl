@@ -130,6 +130,14 @@ export default function Home() {
     return `https://drive.google.com/file/d/${file.id}/preview`
   }
 
+  const getDownloadUrl = (file: DriveFile): string => {
+    return `https://drive.google.com/uc?export=download&id=${file.id}`
+  }
+
+  const getDirectLink = (file: DriveFile): string => {
+    return `https://drive.google.com/file/d/${file.id}/view`
+  }
+
   const isVideoFile = (file: DriveFile): boolean => {
     const extension = file.name.split('.').pop()?.toLowerCase()
     return ['mp4', 'mkv', 'avi', 'mov', 'webm'].includes(extension || '')
@@ -140,10 +148,12 @@ export default function Home() {
     return ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension || '')
   }
 
-  const isAudioFile = (file: DriveFile): boolean => {
-    const extension = file.name.split('.').pop()?.toLowerCase()
-    return ['mp3', 'wav', 'flac', 'm4a'].includes(extension || '')
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text)
   }
+
+  // Get video files for playlist
+  const videoFiles = files.filter(isVideoFile)
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-inter">
@@ -252,9 +262,7 @@ export default function Home() {
             <p className="mt-4 sm:mt-6 text-slate-400 text-sm font-medium">Loading files...</p>
           </div>
         ) : (
-          /* FIXED: Mobile File Grid with NO truncation */
           <div className="bg-slate-900/30 rounded-2xl sm:rounded-3xl border border-slate-800/50 overflow-hidden backdrop-blur-sm">
-            {/* Header */}
             <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 border-b border-slate-800/50">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 sm:gap-3">
@@ -269,7 +277,6 @@ export default function Home() {
               </div>
             </div>
             
-            {/* FIXED: File List - NO TRUNCATION */}
             {files.length === 0 ? (
               <div className="text-center py-16 sm:py-24">
                 <svg className="w-12 h-12 sm:w-16 sm:h-16 text-slate-600 mx-auto mb-4 sm:mb-6" fill="currentColor" viewBox="0 0 20 20">
@@ -285,7 +292,6 @@ export default function Home() {
                     key={file.id} 
                     className="px-4 sm:px-6 lg:px-8 py-4 sm:py-5 hover:bg-slate-800/30 transition-all duration-200 group"
                   >
-                    {/* MOBILE: Card-style layout */}
                     <div className="block sm:flex sm:items-center sm:justify-between">
                       <div className="flex items-start gap-3 sm:gap-5 mb-3 sm:mb-0">
                         <div className="text-xl sm:text-2xl opacity-80 group-hover:opacity-100 transition-opacity duration-200 mt-1 sm:mt-0">
@@ -297,19 +303,17 @@ export default function Home() {
                               onClick={() => handleFolderClick(file.id)}
                               className="text-slate-200 hover:text-white font-medium text-left transition-colors duration-200 w-full"
                             >
-                              {/* FIXED: Allow text to wrap, no truncation */}
                               <div className="break-words leading-tight">
                                 {file.name}
                               </div>
                             </button>
                           ) : (
                             <a
-                              href={`https://drive.google.com/uc?export=download&id=${file.id}`}
+                              href={getDownloadUrl(file)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-slate-200 hover:text-white font-medium block transition-colors duration-200"
                             >
-                              {/* FIXED: Allow text to wrap, no truncation */}
                               <div className="break-words leading-tight">
                                 {file.name}
                               </div>
@@ -328,11 +332,10 @@ export default function Home() {
                         </div>
                       </div>
                       
-                      {/* Action buttons */}
                       {!isFolder(file) && (
                         <div className="flex items-center gap-2 sm:gap-3">
                           <a
-                            href={`https://drive.google.com/uc?export=download&id=${file.id}`}
+                            href={getDownloadUrl(file)}
                             download
                             className="bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white px-3 sm:px-4 py-2 rounded-lg transition-all duration-200 text-xs sm:text-sm font-medium border border-slate-700/50 hover:border-slate-600 flex-1 sm:flex-none text-center"
                           >
@@ -343,7 +346,7 @@ export default function Home() {
                             className="bg-slate-700/50 hover:bg-slate-700 text-slate-300 hover:text-white px-3 sm:px-4 py-2 rounded-lg transition-all duration-200 text-xs sm:text-sm font-medium border border-slate-700/30 hover:border-slate-600 flex-1 sm:flex-none text-center"
                           >
                             Preview
-                          </button>
+                          </a>
                         </div>
                       )}
                     </div>
@@ -355,69 +358,139 @@ export default function Home() {
         )}
       </main>
 
-      {/* Preview Modal */}
+      {/* ENHANCED Preview Modal - Like the image you showed */}
       {previewFile && (
-        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4">
-          <div className="bg-slate-900 rounded-xl sm:rounded-2xl border border-slate-700 max-w-6xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden">
-            <div className="flex items-center justify-between p-4 sm:p-6 border-b border-slate-700">
-              <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                <div className="text-xl sm:text-2xl flex-shrink-0">
-                  {getFileIcon(previewFile)}
-                </div>
-                <div className="min-w-0">
-                  {/* FIXED: Modal title also wraps */}
-                  <h3 className="text-base sm:text-lg font-medium text-slate-200 break-words leading-tight">
+        <div className="fixed inset-0 bg-black z-50 flex">
+          {/* Main Video Area */}
+          <div className="flex-1 flex flex-col">
+            {/* Header */}
+            <div className="bg-slate-900 px-6 py-4 border-b border-slate-700 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="text-xl">{getFileIcon(previewFile)}</div>
+                <div>
+                  <h3 className="font-medium text-slate-200 leading-tight">
                     {previewFile.name}
                   </h3>
-                  <p className="text-xs sm:text-sm text-slate-500">
+                  <p className="text-sm text-slate-500">
                     {previewFile.size && formatFileSize(previewFile.size)} • {formatDate(previewFile.modifiedTime)}
                   </p>
                 </div>
               </div>
               <button
                 onClick={closePreview}
-                className="text-slate-400 hover:text-slate-200 transition-colors p-2 flex-shrink-0"
+                className="text-slate-400 hover:text-slate-200 p-2 text-xl"
               >
-                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"/>
-                </svg>
+                ✕
               </button>
             </div>
 
-            <div className="p-3 sm:p-6">
-              <div className="bg-black rounded-lg sm:rounded-xl overflow-hidden">
+            {/* Video Player */}
+            <div className="flex-1 bg-black flex items-center justify-center">
+              {isVideoFile(previewFile) || isImageFile(previewFile) ? (
                 <iframe
                   src={getPreviewUrl(previewFile)}
-                  className="w-full h-[50vh] sm:h-[60vh] lg:h-[70vh]"
+                  className="w-full h-full"
                   title={previewFile.name}
                   allow="autoplay; fullscreen"
+                  allowFullScreen
                 />
-              </div>
+              ) : (
+                <iframe
+                  src={getPreviewUrl(previewFile)}
+                  className="w-full h-full bg-white"
+                  title={previewFile.name}
+                />
+              )}
+            </div>
 
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-slate-700">
-                <a
-                  href={`https://drive.google.com/uc?export=download&id=${previewFile.id}`}
-                  download
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-6 py-3 rounded-lg sm:rounded-xl transition-all duration-200 font-medium flex items-center justify-center gap-2 text-sm sm:text-base"
+            {/* Action Buttons */}
+            <div className="bg-slate-900 px-6 py-4 border-t border-slate-700 flex flex-wrap gap-3">
+              <a
+                href={getDownloadUrl(previewFile)}
+                download
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd"/>
+                </svg>
+                Download
+              </a>
+
+              <button
+                onClick={() => copyToClipboard(getDirectLink(previewFile))}
+                className="bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2 rounded-lg font-medium"
+              >
+                Copy Link
+              </button>
+
+              <a
+                href={getDirectLink(previewFile)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2 rounded-lg font-medium"
+              >
+                Open in Drive
+              </a>
+
+              {isVideoFile(previewFile) && (
+                <>
+                  <a
+                    href={`vlc://${getDownloadUrl(previewFile)}`}
+                    className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-medium"
+                  >
+                    VLC
+                  </a>
+                  <a
+                    href={`potplayer://${getDownloadUrl(previewFile)}`}
+                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium"
+                  >
+                    PotPlayer
+                  </a>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* SCROLLABLE Playlist Sidebar - Like your image */}
+          <div className="w-80 lg:w-96 bg-slate-900 border-l border-slate-700 flex flex-col">
+            <div className="px-4 py-3 border-b border-slate-700 bg-slate-800">
+              <h4 className="font-medium text-slate-200">
+                Files ({files.length})
+              </h4>
+            </div>
+            
+            {/* FIXED: Scrollable file list */}
+            <div className="flex-1 overflow-y-auto">
+              {files.map((file, index) => (
+                <div
+                  key={file.id}
+                  className={`px-4 py-3 border-b border-slate-700/50 hover:bg-slate-800/50 cursor-pointer transition-colors ${
+                    previewFile.id === file.id ? 'bg-slate-800 border-l-4 border-l-blue-500' : ''
+                  }`}
+                  onClick={() => !isFolder(file) && setPreviewFile(file)}
                 >
-                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd"/>
-                  </svg>
-                  Download
-                </a>
-                <a
-                  href={`https://drive.google.com/file/d/${previewFile.id}/view`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 sm:px-6 py-3 rounded-lg sm:rounded-xl transition-all duration-200 font-medium flex items-center justify-center gap-2 text-sm sm:text-base"
-                >
-                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/>
-                    <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/>
-                  </svg>
-                  Open in Drive
-                </a>
-              </div>
+                  <div className="flex items-start gap-3">
+                    <div className="text-sm opacity-70 mt-0.5">
+                      {getFileIcon(file)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-slate-200 leading-tight break-words">
+                        {file.name}
+                      </p>
+                      <div className="flex items-center gap-2 mt-1">
+                        {file.size && !isFolder(file) && (
+                          <span className="text-xs text-slate-500">
+                            {formatFileSize(file.size)}
+                          </span>
+                        )}
+                        <span className="text-xs text-slate-500">
+                          {formatDate(file.modifiedTime)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
