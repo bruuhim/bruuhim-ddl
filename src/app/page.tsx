@@ -1,6 +1,13 @@
 // src/app/page.tsx
+
+// Define a specific type for our file objects
+type DriveFile = {
+  id: string;
+  name: string;
+  mimeType: string;
+};
+
 async function getFiles() {
-  // This fetch request will be server-side
   const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/files`, { cache: 'no-store' });
   if (!res.ok) {
     throw new Error('Failed to fetch data');
@@ -15,7 +22,7 @@ export default async function HomePage() {
     <main className="container mx-auto p-8">
       <h1 className="text-3xl font-bold mb-6">Files</h1>
       <ul className="list-disc pl-5 space-y-2">
-        {files?.map((file: any) => (
+        {files?.map((file: DriveFile) => ( // Use the specific DriveFile type instead of 'any'
           <li key={file.id} className="text-lg">
             <a
               href={`https://drive.google.com/uc?export=download&id=${file.id}`}
@@ -23,7 +30,6 @@ export default async function HomePage() {
               rel="noopener noreferrer"
               className="text-blue-600 hover:underline"
             >
-              {/* Basic icon logic */}
               {file.mimeType === 'application/vnd.google-apps.folder' ? '📁' : '📄'} {file.name}
             </a>
           </li>
