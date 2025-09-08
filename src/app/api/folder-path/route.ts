@@ -29,25 +29,32 @@ export async function GET(request: NextRequest) {
       realFolderId = folderId
     }
 
-    const path: any[] = []
+    const path: Array<{ id: string; name: string }> = []
     let currentId: string | undefined = realFolderId
 
     while (currentId && currentId !== process.env.NEXT_PUBLIC_GOOGLE_FOLDER_ID) {
-      const response = await drive.files.get({
-        fileId: currentId,
-        fields: 'id,name,parents',
-      })
-
-      if (response.data && response.data.id && response.data.name) {
-        path.unshift({
-          id: encrypt(response.data.id),
-          name: response.data.name,
+      try {
+        // 🔧 FIXED: Explicit typing for response
+        const response: any = await drive.files.get({
+          fileId: currentId,
+          fields: 'id,name,parents',
         })
-        // 🔧 FIXED: Handle undefined parents properly
-        currentId = response.data.parents && response.data.parents.length > 0 
-          ? response.data.parents[0] 
-          : undefined
-      } else {
+
+        if (response.data && response.data.id && response.data.name) {
+          path.unshift({
+            id: encrypt(response.data.id),
+            name: response.data.name,
+          })
+          
+          // Handle undefined parents properly
+          currentId = response.data.parents && response.data.parents.length > 0 
+            ? response.data.parents[0] 
+            : undefined
+        } else {
+          break
+        }
+      } catch (fileError) {
+        console.error('Error fetching file:', fileError)
         break
       }
     }
