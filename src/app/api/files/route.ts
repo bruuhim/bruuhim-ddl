@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { google } from 'googleapis'
-import { encrypt } from '../../../utils/encryption'
 
 const auth = new google.auth.GoogleAuth({
   credentials: {
@@ -21,31 +20,13 @@ export async function GET(request: NextRequest) {
   try {
     const drive = google.drive({ version: 'v3', auth })
     
-    // Use folder ID directly (don't try to decrypt on first load)
-    let realFolderId = folderId
-    
-    // Only try to decrypt if it looks like an encrypted token
-    if (folderId.includes(':') || folderId.length > 50) {
-      try {
-        const { decrypt } = await import('../../../utils/encryption')
-        realFolderId = decrypt(decodeURIComponent(folderId))
-      } catch (e) {
-        console.log('Decryption failed, using original ID')
-        realFolderId = folderId
-      }
-    }
-    
     const response = await drive.files.list({
-      q: `'${realFolderId}' in parents and trashed = false`,
+      q: `'${folderId}' in parents and trashed = false`,
       fields: 'files(id,name,mimeType,size,modifiedTime,parents)',
       orderBy: 'name',
     })
 
-    // ENCRYPT all file IDs before sending to frontend
-    const files = response.data.files?.map(file => ({
-      ...file,
-      id: encrypt(file.id!),
-    })) || []
+    const files = response.data.files || []
 
     return NextResponse.json({ files })
   } catch (error) {

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { google } from 'googleapis'
-import { encrypt } from '../../../utils/encryption'
 
 const auth = new google.auth.GoogleAuth({
   credentials: {
@@ -20,20 +19,8 @@ export async function GET(request: NextRequest) {
 
   try {
     const drive = google.drive({ version: 'v3', auth })
-    
-    // 🔧 FIXED: Same logic as files API
-    let realFolderId = folderId
-    if (folderId.includes(':') || folderId.length > 50) {
-      try {
-        const { decrypt } = await import('../../../utils/encryption')
-        realFolderId = decrypt(decodeURIComponent(folderId))
-      } catch (e) {
-        realFolderId = folderId
-      }
-    }
-
     const path: Array<{ id: string; name: string }> = []
-    let currentId: string | undefined = realFolderId
+    let currentId: string | undefined = folderId
 
     while (currentId && currentId !== process.env.NEXT_PUBLIC_GOOGLE_FOLDER_ID) {
       try {
@@ -44,7 +31,7 @@ export async function GET(request: NextRequest) {
 
         if (response.data && response.data.id && response.data.name) {
           path.unshift({
-            id: encrypt(response.data.id),
+            id: response.data.id,
             name: response.data.name,
           })
           
@@ -55,7 +42,6 @@ export async function GET(request: NextRequest) {
           break
         }
       } catch (fileError) {
-        console.error('Error fetching file:', fileError)
         break
       }
     }
