@@ -39,7 +39,6 @@ export async function GET(request: NextRequest) {
       })
 
       if (response.data && response.data.id && response.data.name) {
-        // 🔐 ENCRYPT folder ID before adding to path
         path.unshift({
           id: encrypt(response.data.id),
           name: response.data.name,
