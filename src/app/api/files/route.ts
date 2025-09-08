@@ -21,10 +21,10 @@ export async function GET(request: NextRequest) {
   try {
     const drive = google.drive({ version: 'v3', auth })
     
-    // 🔧 FIXED: Use folder ID directly (don't try to decrypt on first load)
+    // Use folder ID directly (don't try to decrypt on first load)
     let realFolderId = folderId
     
-    // Only try to decrypt if it looks like an encrypted token (has special chars)
+    // Only try to decrypt if it looks like an encrypted token
     if (folderId.includes(':') || folderId.length > 50) {
       try {
         const { decrypt } = await import('../../../utils/encryption')
@@ -41,7 +41,15 @@ export async function GET(request: NextRequest) {
       orderBy: 'name',
     })
 
-    // 🔐 ENCRYPT all file IDs before sending to frontend
+    // ENCRYPT all file IDs before sending to frontend
     const files = response.data.files?.map(file => ({
       ...file,
-      id: encrypt(file.id!), // Replace real ID with encrypted version
+      id: encrypt(file.id!),
+    })) || []
+
+    return NextResponse.json({ files })
+  } catch (error) {
+    console.error('Error fetching files:', error)
+    return NextResponse.json({ error: 'Failed to fetch files' }, { status: 500 })
+  }
+}
