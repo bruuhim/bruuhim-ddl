@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { google } from 'googleapis'
-import { encrypt, decrypt } from '../../../utils/encryption'
+import { encrypt } from '../../../utils/encryption'
 
 const auth = new google.auth.GoogleAuth({
   credentials: {
@@ -21,12 +21,15 @@ export async function GET(request: NextRequest) {
   try {
     const drive = google.drive({ version: 'v3', auth })
     
-    // Decrypt folder ID
+    // 🔧 FIXED: Same logic as files API
     let realFolderId = folderId
-    try {
-      realFolderId = decrypt(decodeURIComponent(folderId))
-    } catch (e) {
-      realFolderId = folderId
+    if (folderId.includes(':') || folderId.length > 50) {
+      try {
+        const { decrypt } = await import('../../../utils/encryption')
+        realFolderId = decrypt(decodeURIComponent(folderId))
+      } catch (e) {
+        realFolderId = folderId
+      }
     }
 
     const path: Array<{ id: string; name: string }> = []
@@ -34,7 +37,6 @@ export async function GET(request: NextRequest) {
 
     while (currentId && currentId !== process.env.NEXT_PUBLIC_GOOGLE_FOLDER_ID) {
       try {
-        // 🔧 FIXED: Explicit typing for response
         const response: any = await drive.files.get({
           fileId: currentId,
           fields: 'id,name,parents',
@@ -46,7 +48,6 @@ export async function GET(request: NextRequest) {
             name: response.data.name,
           })
           
-          // Handle undefined parents properly
           currentId = response.data.parents && response.data.parents.length > 0 
             ? response.data.parents[0] 
             : undefined
