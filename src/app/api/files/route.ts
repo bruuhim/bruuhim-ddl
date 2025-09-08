@@ -27,7 +27,6 @@ export async function GET(request: NextRequest) {
     })
 
     const files = response.data.files || []
-
     return NextResponse.json({ files })
   } catch (error) {
     console.error('Error fetching files:', error)

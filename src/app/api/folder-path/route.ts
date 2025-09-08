@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
 
     while (currentId && currentId !== process.env.NEXT_PUBLIC_GOOGLE_FOLDER_ID) {
       try {
-        const response: any = await drive.files.get({
+        const response = await drive.files.get({
           fileId: currentId,
           fields: 'id,name,parents',
         })
@@ -35,9 +35,7 @@ export async function GET(request: NextRequest) {
             name: response.data.name,
           })
           
-          currentId = response.data.parents && response.data.parents.length > 0 
-            ? response.data.parents[0] 
-            : undefined
+          currentId = response.data.parents?.[0]
         } else {
           break
         }
