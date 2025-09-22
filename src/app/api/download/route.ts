@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
 import { decryptFileId } from '@/utils/encryption';
-import { Readable } from 'stream/web';
+import { Readable } from 'stream';
 
 const auth = new google.auth.GoogleAuth({
   credentials: {
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
 
     const { name, mimeType, size } = file.data;
 
-    // Get the file content
+    // Get the file content as a Node.js stream
     const response = await drive.files.get(
       {
         fileId,
@@ -53,10 +53,10 @@ export async function GET(request: NextRequest) {
       headers.set('Content-Length', size.toString());
     }
 
-    // Convert the Node.js stream from Google Drive to a Web API stream
-    const stream = Readable.toWeb(response.data as any);
+    // Convert the Node.js stream to a Web API stream
+    const stream = Readable.toWeb(response.data);
 
-    // Return a streaming response with the converted stream
+    // Return a streaming response with the converted Web API stream
     return new NextResponse(stream, {
       headers,
     });
