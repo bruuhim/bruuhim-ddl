@@ -122,17 +122,16 @@ export default function Home() {
     return '📄'
   }
 
-  // ✅ CLEAN GOOGLE DRIVE URLS (NO ENCRYPTION)
   const getPreviewUrl = (file: DriveFile) => {
-    return `https://drive.google.com/file/d/${file.id}/preview`
+    return `/api/preview?id=${encodeURIComponent(file.id)}`
   }
 
   const getDownloadUrl = (file: DriveFile) => {
-    return `https://drive.google.com/uc?export=download&id=${file.id}`
+    return `/api/download?id=${encodeURIComponent(file.id)}`
   }
 
   const getDirectLink = (file: DriveFile) => {
-    return `https://drive.google.com/file/d/${file.id}/view`
+    return `/api/download?id=${encodeURIComponent(file.id)}`
   }
 
   const isVideoFile = (file: DriveFile) => {
