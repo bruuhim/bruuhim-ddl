@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
 import { decryptFileId } from '@/utils/encryption';
-import { Readable } from 'stream';
 
 const auth = new google.auth.GoogleAuth({
   credentials: {
@@ -42,6 +41,17 @@ export async function GET(request: NextRequest) {
       { responseType: 'stream' }
     );
 
+    const nodeStream = response.data;
+
+    // Manually bridge the Node.js stream to a Web API ReadableStream
+    const stream = new ReadableStream({
+      start(controller) {
+        nodeStream.on('data', (chunk) => controller.enqueue(chunk));
+        nodeStream.on('end', () => controller.close());
+        nodeStream.on('error', (err) => controller.error(err));
+      },
+    });
+
     // Create headers for streaming response
     const headers = new Headers({
       'Content-Type': mimeType || 'application/octet-stream',
@@ -53,10 +63,7 @@ export async function GET(request: NextRequest) {
       headers.set('Content-Length', size.toString());
     }
 
-    // Convert the Node.js stream to a Web API stream
-    const stream = Readable.toWeb(response.data);
-
-    // Return a streaming response with the converted Web API stream
+    // Return a streaming response with the bridged stream
     return new NextResponse(stream, {
       headers,
     });
